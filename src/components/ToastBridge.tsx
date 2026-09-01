@@ -1,0 +1,2 @@
+import { useEffect, useState } from 'react'
+export function ToastBridge() { const [message, setMessage] = useState(''); useEffect(() => { const handle = (event: Event) => { const custom = event as CustomEvent<string>; setMessage(custom.detail); window.setTimeout(() => setMessage(''), 3200) }; window.addEventListener('cropsmart-toast', handle); return () => window.removeEventListener('cropsmart-toast', handle) }, []); return message ? <div className="toast" role="status">{message}</div> : null }
