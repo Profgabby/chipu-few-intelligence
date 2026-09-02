@@ -1,4 +1,4 @@
-# CropSmart™ Research Digital Twin
+# CropSmart Research Digital Twin
 
 A standard React + Vite + TypeScript materialization of the CropSmart agricultural water–energy intelligence research demonstration.
 

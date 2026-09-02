@@ -2,7 +2,7 @@
 
 ## Research Demonstrator Baseline
 
-Version 0.2.0 establishes the first reproducible public research-demonstrator baseline for CropSmart™ Research Digital Twin.
+Version 0.2.0 establishes the first reproducible public research-demonstrator baseline for CropSmart Research Digital Twin.
 
 This release preserves the current observation-informed interface for water, energy, crop, agrivoltaic, uncertainty, scenario, postharvest, and resource-allocation exploration while formalizing the software environment used to build it.
 
