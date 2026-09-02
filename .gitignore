@@ -4,12 +4,21 @@
 .env.*.local
 
 # Dependencies
-node_modules
+node_modules/
 
-# Build output
-dist
-.vite
+# Build and tool output
+dist/
+.vite/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Test / coverage output
+coverage/
 
 # OS / editor
 .DS_Store
+Thumbs.db
+.vscode/
+.idea/
 *.log
