@@ -19,4 +19,6 @@ Changes to equations, scientific assumptions, provenance classes, uncertainty ha
 
 ## Dependency policy
 
-The current dependency declarations use `latest`. Do not guess or manually invent fixed versions. Dependency pinning should be completed only after a verified install produces a trustworthy lockfile. Once a lockfile is committed, CI should switch from `npm install` to `npm ci` for reproducible builds.
+Direct npm dependencies are pinned to the exact versions resolved and verified in a clean GitHub Actions environment. The committed `package-lock.json` is the authoritative dependency graph for reproducible installs. CI uses `npm ci` and a pinned Node.js runtime rather than resolving moving `latest` declarations.
+
+Dependency updates should be made deliberately on a maintenance branch, regenerate `package-lock.json`, pass the complete production build, and be reviewed in a pull request before reaching `main`. Do not manually alter lockfile resolution data without regenerating and verifying the dependency graph.
