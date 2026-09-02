@@ -1,0 +1,50 @@
+name: Remove trademark symbol
+
+on:
+  push:
+    branches: [design/interface-polish-v2]
+
+permissions:
+  contents: write
+
+jobs:
+  sanitize-brand-text:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/interface-polish-v2
+      - name: Remove trademark symbol from text files
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          extensions = {'.ts', '.tsx', '.js', '.jsx', '.css', '.html', '.md', '.json', '.yml', '.yaml', '.toml', '.txt', '.svg'}
+          mark = chr(0x2122)
+          changed = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or '.git' in path.parts or path.suffix.lower() not in extensions:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              if mark in text:
+                  path.write_text(text.replace(mark, ''), encoding='utf-8')
+                  changed.append(str(path))
+          print('Updated files:')
+          print('\n'.join(changed) if changed else 'none')
+          PY
+      - name: Commit text cleanup
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No trademark symbols found."
+          else
+            git commit -m "chore: remove trademark symbol from CropSmart text"
+            git push origin HEAD:design/interface-polish-v2
+          fi
