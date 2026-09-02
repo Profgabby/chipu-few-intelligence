@@ -1,0 +1,210 @@
+/* Final visual polish for CropSmart research interface.
+   Visual-only: no scientific calculations, routes, provenance semantics, or model behavior are changed. */
+
+:root {
+  --polish-sidebar: 276px;
+  --polish-green-950: #082f25;
+  --polish-green-900: #0b3b2d;
+  --polish-green-800: #15513e;
+  --polish-line: #dfe7e3;
+  --polish-grid: rgba(92, 112, 103, 0.13);
+  --polish-chip-high-bg: #fff3e8;
+  --polish-chip-high-fg: #a55716;
+  --polish-chip-medium-bg: #fff8e5;
+  --polish-chip-medium-fg: #8c6919;
+  --polish-chip-low-bg: #eaf5ef;
+  --polish-chip-low-fg: #236747;
+}
+
+/* Give the analytical workspace more room without losing the strong navigation rail. */
+.desktop-sidebar { flex: 0 0 var(--polish-sidebar); }
+.sidebar { width: var(--polish-sidebar); padding: 18px 12px 14px; }
+
+/* More disciplined brand lockup. */
+.sidebar-brand {
+  gap: 10px;
+  padding: 2px 8px 16px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255,255,255,.11);
+}
+.sidebar-brand strong { font-size: 14px; line-height: 1.1; letter-spacing: -.015em; }
+.sidebar-brand small { margin-top: 2px; font-size: 9.5px; line-height: 1.2; }
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  box-shadow: 0 5px 14px rgba(0,0,0,.09);
+}
+.sidebar-label { padding-top: 18px; }
+
+/* Instrument-style context bar. */
+.context-bar {
+  min-height: 56px;
+  padding: 9px 28px;
+  border-bottom: 1px solid #ccd9d3;
+  background: linear-gradient(180deg, #e8f1ed 0%, #e4eee9 100%);
+  box-shadow: inset 0 -1px 0 rgba(17,66,49,.035), 0 2px 8px rgba(18,55,42,.035);
+}
+.context-status {
+  padding-right: 15px;
+  border-right: 1px solid #c7d6cf;
+}
+.context-bar label {
+  padding: 2px 0;
+  color: #53685f;
+  font-weight: 600;
+}
+.context-bar select {
+  min-height: 34px;
+  border-color: #cbd8d2;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 1px 1px rgba(9,47,37,.02);
+}
+.context-tail {
+  padding: 5px 9px;
+  border: 1px solid #c6d7cf;
+  border-radius: 6px;
+  background: rgba(255,255,255,.54);
+  letter-spacing: .035em;
+}
+
+/* More restrained page heading and tighter analytical hierarchy. */
+.workspace { padding-top: 30px; }
+.workspace-header h1 {
+  font-size: clamp(30px, 3.5vw, 42px);
+  line-height: 1.04;
+  letter-spacing: -.042em;
+}
+.workspace-header p { margin-top: 2px; }
+.workspace-controls { padding: 9px; }
+
+/* KPI cards: shorter, denser, and easier to scan. */
+.metric-card {
+  min-height: 124px;
+  padding: 15px 16px 14px;
+}
+.metric-top .eyebrow,
+.metric-top > span:first-child,
+.metric-card .eyebrow {
+  font-size: 8px;
+  letter-spacing: .15em;
+}
+.metric-label {
+  margin-top: 8px;
+  color: #3f584d;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.metric-value {
+  margin-top: 9px;
+  font-size: 24px;
+  line-height: 1;
+}
+.metric-meta {
+  margin-top: 10px;
+  gap: 7px;
+}
+.quality { padding: 3px 6px; }
+
+/* Technical flow line with explicit direction. */
+.flow-grid {
+  gap: 12px;
+  padding: 6px 0 4px;
+}
+.flow-grid::before { display: none; }
+.flow-item {
+  overflow: visible;
+  min-height: 72px;
+  border-color: #d7e2dc;
+  background: #f8fbf9;
+  box-shadow: 0 2px 7px rgba(12,47,36,.028);
+}
+.flow-item:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  z-index: 4;
+  width: 12px;
+  transform: translateY(-52%);
+  color: #2d765a;
+  background: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Scientific-looking plot surface rather than decorative bars. */
+.chart {
+  position: relative;
+  background-color: #f9fbfa;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(25% - 1px),
+    var(--polish-grid) calc(25% - 1px),
+    var(--polish-grid) 25%
+  );
+  border-color: #dfe7e3;
+  box-shadow: inset 0 -1px 0 #bccbc4;
+}
+.chart::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 10px;
+  height: 1px;
+  background: #b7c7bf;
+  pointer-events: none;
+}
+.chart i { position: relative; z-index: 1; }
+
+/* Restrained status chips across analytical lists. */
+.list-row em {
+  min-width: 58px;
+  padding: 4px 8px;
+  border: 1px solid #e5d6bf;
+  border-radius: 999px;
+  background: var(--polish-chip-high-bg);
+  color: var(--polish-chip-high-fg);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.list-row em.green-text,
+.list-row em.low,
+.list-row em[data-tone='low'] {
+  border-color: #cfe3d8;
+  background: var(--polish-chip-low-bg);
+  color: var(--polish-chip-low-fg);
+}
+
+/* Slightly calmer panels and consistent density throughout every module. */
+.panel-header { padding: 15px 18px 13px; }
+.panel-body { padding: 18px; }
+.panel-header h2 { font-size: 15.5px; }
+.signal, .mini-card, .comparison-head > div, .node, .rank-row { box-shadow: none; }
+.two-col { gap: 17px; }
+.module-stack { gap: 18px; }
+
+/* The Netlify badge is injected in an isolated frame and cannot be removed by site CSS.
+   It should be disabled from Netlify Project configuration > General > Powered by Netlify badge. */
+
+@media (max-width: 1100px) {
+  .desktop-sidebar { flex-basis: 238px; }
+  .sidebar { width: 238px; }
+  .workspace-header h1 { font-size: 36px; }
+}
+
+@media (max-width: 760px) {
+  .workspace-header h1 { font-size: 30px; }
+  .metric-card { min-height: 116px; }
+  .flow-item:not(:last-child)::after { display: none; }
+  .context-status { border-right: 0; padding-right: 0; }
+  .context-tail { width: auto; }
+}
