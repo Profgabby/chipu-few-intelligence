@@ -11,6 +11,7 @@ import './forecast-engine.css'
 import './water-engine.css'
 import './energy-engine.css'
 import './resource-allocation.css'
+import './scenario-lab.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
