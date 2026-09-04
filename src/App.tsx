@@ -6,6 +6,7 @@ import { TwinStateWorkspace } from './components/TwinStateWorkspace'
 import { ForecastWorkspace } from './components/ForecastWorkspace'
 import { WaterIntelligenceWorkspace } from './components/WaterIntelligenceWorkspace'
 import { EnergyIntelligenceWorkspace } from './components/EnergyIntelligenceWorkspace'
+import { ResourceAllocationWorkspace } from './components/ResourceAllocationWorkspace'
 import { ToastBridge } from './components/ToastBridge'
 
 const screens = [
@@ -15,7 +16,6 @@ const screens = [
   ['storage', 'storage'],
   ['scenarios', 'scenarios'],
   ['uncertainty', 'uncertainty'],
-  ['resource-allocation', 'resources'],
   ['experiments', 'experiments'],
   ['export', 'export'],
   ['methods', 'methods'],
@@ -36,13 +36,14 @@ export default function App() {
           <Route path="/app/forecast" element={<ForecastWorkspace />} />
           <Route path="/app/water" element={<WaterIntelligenceWorkspace />} />
           <Route path="/app/energy" element={<EnergyIntelligenceWorkspace />} />
+          <Route path="/app/resource-allocation" element={<ResourceAllocationWorkspace />} />
+          <Route path="/app/resources" element={<ResourceAllocationWorkspace />} />
           {screens.map(([path, screen]) => (
             <Route key={path} path={`/app/${path}`} element={<CropSmartWorkspace screen={screen} />} />
           ))}
           <Route path="/app/twin" element={<CropSmartWorkspace screen="twin" />} />
           <Route path="/app/comparison" element={<CropSmartWorkspace screen="comparison" />} />
           <Route path="/app/crop" element={<CropSmartWorkspace screen="crop" />} />
-          <Route path="/app/resources" element={<CropSmartWorkspace screen="resources" />} />
           <Route path="/app/*" element={<Navigate to="/app" replace />} />
         </Route>
       </Routes>
