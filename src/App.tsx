@@ -1,11 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
 import { CropSmartWorkspace } from './components/CropSmartWorkspace'
+import { DataProvenanceWorkspace } from './components/DataProvenanceWorkspace'
 import { ToastBridge } from './components/ToastBridge'
 
 const screens = [
   ['farm', 'twin'],
-  ['data', 'data'],
   ['twin-state', 'state'],
   ['forecast', 'forecast'],
   ['water', 'water'],
@@ -33,6 +33,11 @@ export default function App() {
           <Route
             path="/app"
             element={<CropSmartWorkspace screen="home" />}
+          />
+
+          <Route
+            path="/app/data"
+            element={<DataProvenanceWorkspace />}
           />
 
           {screens.map(([path, screen]) => (
