@@ -13,11 +13,5 @@ import './energy-engine.css'
 import './resource-allocation.css'
 import './scenario-lab.css'
 import './uncertainty-explorer.css'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
-)
+import './experiment-registry.css'
+createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter><App /></BrowserRouter></StrictMode>)
