@@ -12,6 +12,7 @@ import './water-engine.css'
 import './energy-engine.css'
 import './resource-allocation.css'
 import './scenario-lab.css'
+import './uncertainty-explorer.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
