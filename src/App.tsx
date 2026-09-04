@@ -4,11 +4,11 @@ import { CropSmartWorkspace } from './components/CropSmartWorkspace'
 import { DataProvenanceWorkspace } from './components/DataProvenanceWorkspace'
 import { TwinStateWorkspace } from './components/TwinStateWorkspace'
 import { ForecastWorkspace } from './components/ForecastWorkspace'
+import { WaterIntelligenceWorkspace } from './components/WaterIntelligenceWorkspace'
 import { ToastBridge } from './components/ToastBridge'
 
 const screens = [
   ['farm', 'twin'],
-  ['water', 'water'],
   ['energy', 'energy'],
   ['agrivoltaics', 'comparison'],
   ['crops', 'crop'],
@@ -34,6 +34,7 @@ export default function App() {
           <Route path="/app/twin-state" element={<TwinStateWorkspace />} />
           <Route path="/app/state" element={<TwinStateWorkspace />} />
           <Route path="/app/forecast" element={<ForecastWorkspace />} />
+          <Route path="/app/water" element={<WaterIntelligenceWorkspace />} />
           {screens.map(([path, screen]) => (
             <Route key={path} path={`/app/${path}`} element={<CropSmartWorkspace screen={screen} />} />
           ))}
