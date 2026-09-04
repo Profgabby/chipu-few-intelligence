@@ -8,6 +8,7 @@ import { WaterIntelligenceWorkspace } from './components/WaterIntelligenceWorksp
 import { EnergyIntelligenceWorkspace } from './components/EnergyIntelligenceWorkspace'
 import { ResourceAllocationWorkspace } from './components/ResourceAllocationWorkspace'
 import { ScenarioLaboratoryWorkspace } from './components/ScenarioLaboratoryWorkspace'
+import { UncertaintyExplorerWorkspace } from './components/UncertaintyExplorerWorkspace'
 import { ToastBridge } from './components/ToastBridge'
 
 const screens = [
@@ -15,7 +16,6 @@ const screens = [
   ['agrivoltaics', 'comparison'],
   ['crops', 'crop'],
   ['storage', 'storage'],
-  ['uncertainty', 'uncertainty'],
   ['experiments', 'experiments'],
   ['export', 'export'],
   ['methods', 'methods'],
@@ -40,6 +40,8 @@ export default function App() {
           <Route path="/app/resources" element={<ResourceAllocationWorkspace />} />
           <Route path="/app/scenarios" element={<ScenarioLaboratoryWorkspace />} />
           <Route path="/app/scenario-laboratory" element={<ScenarioLaboratoryWorkspace />} />
+          <Route path="/app/uncertainty" element={<UncertaintyExplorerWorkspace />} />
+          <Route path="/app/uncertainty-explorer" element={<UncertaintyExplorerWorkspace />} />
           {screens.map(([path, screen]) => (
             <Route key={path} path={`/app/${path}`} element={<CropSmartWorkspace screen={screen} />} />
           ))}
