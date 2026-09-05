@@ -14,4 +14,5 @@ import './resource-allocation.css'
 import './scenario-lab.css'
 import './uncertainty-explorer.css'
 import './experiment-registry.css'
+import './research-export.css'
 createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter><App /></BrowserRouter></StrictMode>)
