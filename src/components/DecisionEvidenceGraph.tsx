@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, BarChart3, BrainCircuit, CircleDot, Droplets, Gauge, Globe2, HeartHandshake, ShieldCheck, Sprout, Sun, UsersRound } from 'lucide-react'
+import { Activity, ArrowRight, BarChart3, BrainCircuit, CircleDot, Droplets, Gauge, Globe2, ShieldCheck, Sprout, Sun, UsersRound } from 'lucide-react'
 import type { CommandCenterState } from '../lib/command-center-engine'
 import type { Zone } from '../lib/cropsmart-model'
 import { buildDecisionEvidenceGraph, type EvidenceNode, type EvidenceNodeId } from '../lib/decision-evidence-graph'
+import '../evidence-graph.css'
 
 const icons:Record<EvidenceNodeId,typeof Activity>={people:UsersRound,place:Globe2,food:Sprout,energy:Sun,water:Droplets,twin:Activity,predict:BrainCircuit,control:Gauge,economics:BarChart3,resilience:ShieldCheck,decision:CircleDot}
 const nodePos=(node:EvidenceNode)=>({left:`${5+(node.column-1)*15}%`,top:`${node.row===1?12:node.row===2?49:86}%`})
