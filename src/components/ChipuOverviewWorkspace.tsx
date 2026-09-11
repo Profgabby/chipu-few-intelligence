@@ -5,6 +5,7 @@ import { CHIPU_PRODUCT } from '../lib/chipu-modules'
 import { getZone } from '../lib/cropsmart-model'
 import { loadCommandCenterState, stateComponent, type CommandCenterState } from '../lib/command-center-engine'
 import { useResearchContext } from '../lib/research-context'
+import { DecisionEvidenceGraph } from './DecisionEvidenceGraph'
 
 type Card = { id:string; title:string; kicker:string; route:string; icon:typeof Activity; status:string; detail:string; evidence?:string; action:string }
 const value = (n: unknown) => typeof n === 'number' && Number.isFinite(n) ? n : null
@@ -15,7 +16,7 @@ export function ChipuOverviewWorkspace() {
   const [state,setState]=useState<CommandCenterState|null>(null)
   const [busy,setBusy]=useState(false)
   const refresh=async()=>{setBusy(true);try{setState(await loadCommandCenterState(farmId))}finally{setBusy(false)}}
-  useEffect(()=>{refresh()},[farmId,zoneId,scenario])
+  useEffect(()=>{void refresh()},[farmId,zoneId,scenario])
   const zone=getZone(zoneId)
   const soil=stateComponent(state?.twin,'soil_water_rootzone')
   const tank=stateComponent(state?.twin,'tank_level')
@@ -39,7 +40,7 @@ export function ChipuOverviewWorkspace() {
   return <div className="workspace command-center">
     <header className="command-hero">
       <div className="command-hero-copy"><div className="eyebrow eyebrow-status"><span className="status-dot"/>INTEGRATED FEW COMMAND CENTER</div><h1>{CHIPU_PRODUCT.name}</h1><p>One research cockpit for context, system state, prediction, control, economics and resilience—without invented production values.</p><div className="command-context-line"><span>{workspaceName}</span><i/> <span>{farmId}</span><i/> <span>{zoneId}</span><i/> <span>{scenario}</span></div></div>
-      <button className="command-refresh" onClick={refresh} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh evidence'}</button>
+      <button className="command-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh evidence'}</button>
     </header>
 
     <section className="command-ribbon">
@@ -52,6 +53,8 @@ export function ChipuOverviewWorkspace() {
       <div><HeartHandshake size={18}/><span>PERSISTENCE</span><strong>{state?.connected?'Protected research session':'Not connected'}</strong></div>
       <div><CircleAlert size={18}/><span>DATA BOUNDARY</span><strong>Measured / modeled / synthetic kept distinct</strong></div>
     </section>
+
+    <DecisionEvidenceGraph state={state} zone={zone}/>
 
     <section className="command-grid">{cards.map(({icon:Icon,...card})=><Link to={card.route} className={`command-card command-card-${card.id}`} key={card.id}><div className="command-card-top"><div className="command-card-icon"><Icon size={19}/></div><div><span>{card.kicker}</span><h2>{card.title}</h2></div>{card.evidence&&<em>{card.evidence}</em>}</div><div className="command-card-signal"><strong>{card.status}</strong><p>{card.detail}</p></div><div className="command-card-action">{card.action}<ArrowRight size={15}/></div></Link>)}</section>
 
