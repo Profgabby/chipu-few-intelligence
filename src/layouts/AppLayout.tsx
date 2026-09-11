@@ -1,8 +1,60 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Activity, Beaker, BookOpen, Database, Droplets, FlaskConical, Gauge, GitBranch, GitCompare, Info, LayoutDashboard, Menu, RadioTower, SlidersHorizontal, Snowflake, Sprout, Sun, Upload, X, Zap } from 'lucide-react'
-import { useState } from 'react'
+import { Activity, BarChart3, BookOpen, Building2, Database, Droplets, Gauge, Globe2, HeartHandshake, HelpCircle, LayoutDashboard, Menu, Settings, ShieldCheck, Sprout, Sun, TrendingUp, X, Zap } from 'lucide-react'
+import { useState, type ComponentType } from 'react'
 import { ResearchContextProvider } from '../lib/research-context'
 import { ResearchContextBar } from '../components/ResearchContextBar'
-const nav=[['/app','Research Home',LayoutDashboard],['/app/farm','Farm Digital Twin',GitBranch],['/app/data','Data & Provenance',Database],['/app/field-data','Field Data & Sensors',RadioTower],['/app/twin-state','Twin State',Activity],['/app/forecast','Forecast & Prediction',Sun],['/app/water','Water Intelligence',Droplets],['/app/energy','Energy Intelligence',Zap],['/app/agrivoltaics','Agrivoltaic Comparison',GitCompare],['/app/crops','Crop & Harvest',Sprout],['/app/storage','Food Loss & Storage',Snowflake],['/app/scenarios','Scenario Laboratory',FlaskConical],['/app/uncertainty','Uncertainty Explorer',SlidersHorizontal],['/app/resource-allocation','Resource Allocation',Gauge],['/app/experiments','Experiment Registry',Beaker],['/app/export','Research Export',Upload],['/app/methods','Models & Methods',BookOpen],['/app/about','About the Research',Info]] as const
-function Sidebar({onNavigate}:{onNavigate?:()=>void}){return <aside className="sidebar"><div className="sidebar-brand"><span className="brand-mark">C</span><div><strong>CropSmart</strong><small>Research digital twin</small></div></div><div className="sidebar-label">Research environment</div><nav className="sidebar-nav">{nav.map(([to,label,Icon])=><NavLink key={to} to={to} end={to==='/app'} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{label}</span></NavLink>)}</nav><div className="sidebar-footer"><div className="avatar">U</div><div><strong>Research user</strong><small>Synthetic workspace</small></div></div></aside>}
-export function AppLayout(){const[mobileOpen,setMobileOpen]=useState(false);return <ResearchContextProvider><div className="app-shell"><div className="mobile-header"><button className="icon-button" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={19}/></button><strong>CropSmart</strong></div><div className={`mobile-drawer ${mobileOpen?'mobile-drawer-open':''}`}><div className="mobile-drawer-top"><strong>Navigation</strong><button className="icon-button" onClick={()=>setMobileOpen(false)} aria-label="Close navigation"><X size={18}/></button></div><Sidebar onNavigate={()=>setMobileOpen(false)}/></div><div className="desktop-sidebar"><Sidebar/></div><main className="app-main"><ResearchContextBar/><Outlet/></main></div></ResearchContextProvider>}
+import { CHIPU_MODULES, CHIPU_PRODUCT, CHIPU_UTILITY_NAV, type ChipuModuleId } from '../lib/chipu-modules'
+
+const moduleIcons: Record<ChipuModuleId, ComponentType<{size?:number}>> = {
+  twin: Activity,
+  predict: TrendingUp,
+  food: Sprout,
+  energy: Zap,
+  water: Droplets,
+  people: HeartHandshake,
+  place: Globe2,
+  control: Gauge,
+  economics: BarChart3,
+  resilience: ShieldCheck,
+}
+
+const utilityIcons: Record<string, ComponentType<{size?:number}>> = {
+  data: Database,
+  reports: BookOpen,
+  settings: Settings,
+  administration: Building2,
+  help: HelpCircle,
+}
+
+const researchTools = [
+  ['/app/field-data','Field Data & Sensors',Database],
+  ['/app/experiments','Experiment Registry',BookOpen],
+  ['/app/methods','Models & Methods',BookOpen],
+  ['/app/calibration-validation','Model Calibration',Activity],
+] as const
+
+function Sidebar({onNavigate}:{onNavigate?:()=>void}) {
+  return <aside className="sidebar">
+    <div className="sidebar-brand"><span className="brand-mark">CF</span><div><strong>{CHIPU_PRODUCT.name}</strong><small>{CHIPU_PRODUCT.descriptor}</small></div></div>
+    <div className="sidebar-label">Decision system</div>
+    <nav className="sidebar-nav">
+      <NavLink to="/app" end onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><LayoutDashboard size={16}/><span>Overview</span></NavLink>
+      {CHIPU_MODULES.map(module=>{const Icon=moduleIcons[module.id];return <NavLink key={module.id} to={module.route} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{module.shortName}</span></NavLink>})}
+    </nav>
+    <div className="sidebar-label">Platform utilities</div>
+    <nav className="sidebar-nav">{CHIPU_UTILITY_NAV.map(item=>{const Icon=utilityIcons[item.id];return <NavLink key={item.id} to={item.route} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{item.label}</span></NavLink>})}</nav>
+    <div className="sidebar-label">Research tools</div>
+    <nav className="sidebar-nav sidebar-nav-secondary">{researchTools.map(([to,label,Icon])=><NavLink key={to} to={to} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{label}</span></NavLink>)}</nav>
+    <div className="sidebar-footer"><div className="avatar">R</div><div><strong>Research workspace</strong><small>Evidence-aware decision support</small></div></div>
+  </aside>
+}
+
+export function AppLayout(){
+  const[mobileOpen,setMobileOpen]=useState(false)
+  return <ResearchContextProvider><div className="app-shell">
+    <div className="mobile-header"><button className="icon-button" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={19}/></button><strong>{CHIPU_PRODUCT.shortName}</strong></div>
+    <div className={`mobile-drawer ${mobileOpen?'mobile-drawer-open':''}`}><div className="mobile-drawer-top"><strong>Navigation</strong><button className="icon-button" onClick={()=>setMobileOpen(false)} aria-label="Close navigation"><X size={18}/></button></div><Sidebar onNavigate={()=>setMobileOpen(false)}/></div>
+    <div className="desktop-sidebar"><Sidebar/></div>
+    <main className="app-main"><ResearchContextBar/><Outlet/></main>
+  </div></ResearchContextProvider>
+}
