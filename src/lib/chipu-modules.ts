@@ -41,7 +41,7 @@ export const CHIPU_PRODUCT = {
 
 export const CHIPU_UTILITY_NAV = [
   { id: 'data', label: 'Data', route: '/app/data' },
-  { id: 'reports', label: 'Reports', route: '/app/export' },
+  { id: 'reports', label: 'Reports', route: '/app/reports' },
   { id: 'settings', label: 'Settings', route: '/app/settings' },
   { id: 'administration', label: 'Administration', route: '/app/administration' },
   { id: 'help', label: 'Help', route: '/app/help' },
