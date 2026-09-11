@@ -1,0 +1,1 @@
+Stage 2 documentation index: operational domains, capability map, persistence security, UI system, model boundaries, verification, release notes, decision chain, energy-water subsystem positioning, database table inventory, empty-state policy, and backward compatibility.
