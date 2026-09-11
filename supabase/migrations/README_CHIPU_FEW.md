@@ -1,0 +1,1 @@
+CHIPU-FEW migrations are additive. Do not rename or drop legacy `cs_*` tables solely for branding. The 20260911143000 migration establishes operational domain persistence; 20260911143100 adds covering indexes identified during database advisory review.
