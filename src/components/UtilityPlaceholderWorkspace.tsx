@@ -1,0 +1,3 @@
+export function UtilityPlaceholderWorkspace({title,description}:{title:string;description:string}) {
+  return <div className="workspace"><header className="workspace-header"><div><div className="eyebrow eyebrow-status"><span className="status-dot" />PLATFORM UTILITY</div><h1>{title}</h1><p>{description}</p></div></header><section className="panel"><div className="panel-header"><div className="eyebrow">STATUS</div><h2>Not yet configured</h2></div><div className="panel-body"><p>This utility route is reserved in the CHIPU-FEW information architecture. No production capability is fabricated here.</p></div></section></div>
+}

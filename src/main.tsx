@@ -5,6 +5,7 @@ import App from './App'
 import './index.css'
 import './professional-ui.css'
 import './interface-polish.css'
+import './chipu-few.css'
 import './data-engine.css'
 import './twin-state.css'
 import './forecast-engine.css'
@@ -19,4 +20,9 @@ import './models-methods.css'
 import './model-calibration-validation.css'
 import './field-sensor-integration.css'
 import './telemetry-gateway.css'
+
+document.title = 'CHIPU-FEW Intelligence'
+const description = document.querySelector<HTMLMetaElement>('meta[name="description"]')
+if (description) description.content = 'CHIPU-FEW Intelligence — Integrated Predictive Decision Systems for Food–Energy–Water Management.'
+
 createRoot(document.getElementById('root')!).render(<StrictMode><BrowserRouter><App /></BrowserRouter></StrictMode>)
