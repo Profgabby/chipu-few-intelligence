@@ -4,7 +4,7 @@ import { Activity, ArrowRight, BarChart3, BrainCircuit, CircleDot, Droplets, Gau
 import type { CommandCenterState } from '../lib/command-center-engine'
 import type { Zone } from '../lib/cropsmart-model'
 import { runForecast } from '../lib/forecast-engine'
-import { runScenarioExperiment } from '../lib/scenario-laboratory-engine'
+import { runForecastDrivenControl } from '../lib/forecast-control-engine'
 import { buildDecisionEvidenceGraph, type EvidenceEdge, type EvidenceNode, type EvidenceNodeId } from '../lib/decision-evidence-graph'
 import '../evidence-graph.css'
 
@@ -30,7 +30,7 @@ export function DecisionEvidenceGraph({state,zone,scenarioId,onEvidenceChanged}:
 
   const workflowFor=(item:EvidenceEdge)=>{
     if(item.from==='twin'&&item.to==='predict') return {label:'Run Forecast',detail:state?.twin?'Create a forecast from the currently selected persisted Twin state.':'A Twin state is required first.',enabled:Boolean(state?.twin)}
-    if(item.from==='predict'&&item.to==='control') return {label:'Run Scenario / Control',detail:state?.forecast?`Run ${scenarioId} using the forecast lineage. The current Scenario Laboratory uses the forecast initial Twin state; forecast-trajectory propagation is not yet implemented.`:'A forecast is required first.',enabled:Boolean(state?.forecast)}
+    if(item.from==='predict'&&item.to==='control') return {label:'Run Forecast-Driven Control',detail:state?.forecast?`Run ${scenarioId} across all ${state.forecast.points.length} forecast points over the ${state.forecast.horizonHours}-hour planning horizon, propagating crop-water demand, photovoltaic availability, pumping demand, battery state and forecast uncertainty into strategy ranking.`:'A forecast is required first.',enabled:Boolean(state?.forecast)}
     if(item.from==='control'&&item.to==='economics') return {label:'Open pre-filled Economics',detail:state?.scenarioRun?'Carry the selected Control run into Economics as documented operational context. Monetary inputs remain researcher-entered.':'A Control run is required first.',enabled:Boolean(state?.scenarioRun)}
     if(item.from==='control'&&item.to==='resilience') return {label:'Open pre-filled Resilience',detail:state?.scenarioRun?'Carry the selected Control run directly into the existing resilience assessment engine.':'A Control run is required first.',enabled:Boolean(state?.scenarioRun)}
     const target=graph.nodes.find(node=>node.id===item.to)
@@ -48,8 +48,8 @@ export function DecisionEvidenceGraph({state,zone,scenarioId,onEvidenceChanged}:
       }
       if(item.from==='predict'&&item.to==='control'){
         if(!state?.forecast)throw new Error('Run Predict before launching Control.')
-        const run=await runScenarioExperiment({stateId:state.forecast.initialStateId,scenarioId})
-        setWorkflowMessage(`Control run ${run.runId} completed from forecast lineage ${state.forecast.id}; the current control engine uses its initial Twin state.`)
+        const run=await runForecastDrivenControl({forecast:state.forecast,scenarioId})
+        setWorkflowMessage(`Forecast-driven Control ${run.runId} evaluated ${run.trajectory.pointCount} forecast steps across ${run.trajectory.horizonHours} hours. Best strategy: ${run.bestStrategy}.`)
         await onEvidenceChanged();return
       }
       if(item.from==='control'&&item.to==='economics'){
