@@ -54,7 +54,7 @@ export function ChipuOverviewWorkspace() {
       <div><CircleAlert size={18}/><span>DATA BOUNDARY</span><strong>Measured / modeled / synthetic kept distinct</strong></div>
     </section>
 
-    <DecisionEvidenceGraph state={state} zone={zone}/>
+    <DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>
 
     <section className="command-grid">{cards.map(({icon:Icon,...card})=><Link to={card.route} className={`command-card command-card-${card.id}`} key={card.id}><div className="command-card-top"><div className="command-card-icon"><Icon size={19}/></div><div><span>{card.kicker}</span><h2>{card.title}</h2></div>{card.evidence&&<em>{card.evidence}</em>}</div><div className="command-card-signal"><strong>{card.status}</strong><p>{card.detail}</p></div><div className="command-card-action">{card.action}<ArrowRight size={15}/></div></Link>)}</section>
 
