@@ -10,3 +10,5 @@
 .water-next h2 { margin:0; font-size:19px; }.water-next p { color:var(--text-secondary); }
 .water-assumptions { margin:24px 0; font-size:13px; color:var(--text-secondary); }.water-assumptions summary { cursor:pointer; font-weight:600; }
 .water-hero h1 { font-size:clamp(30px,3vw,40px); }.water-hero { align-items:center; }
+
+.water-snapshot { margin:24px 0; padding:20px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }.water-snapshot header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.water-snapshot h2{font-size:19px;margin:0}.water-snapshot p,.water-run-requirement{font-size:13px;color:var(--text-secondary)}.water-hero{margin-bottom:12px}.water-snapshot table{font-size:13px}.water-snapshot .table-wrap{margin:12px 0}
