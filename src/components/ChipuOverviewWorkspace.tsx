@@ -62,6 +62,14 @@ export function ChipuOverviewWorkspace() {
       <DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>
     </section>
 
-    {state?.errors.length?<section className="command-note"><CircleAlert size={18}/><div><strong>Some evidence sources are unavailable.</strong><p>The interface leaves unavailable research evidence unpopulated rather than substituting values.</p></div></section>:null}
+    {state?.errors.length ? (
+      <section className="command-note">
+        <CircleAlert size={18}/>
+        <div>
+          <strong>Some evidence sources are unavailable.</strong>
+          <p>The interface leaves unavailable research evidence unpopulated rather than substituting values.</p>
+        </div>
+      </section>
+    ) : null}
   </div>
 }
