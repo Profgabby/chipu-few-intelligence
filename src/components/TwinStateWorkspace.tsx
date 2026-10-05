@@ -3,6 +3,7 @@ import { CheckCircle2, Database, Download, RefreshCw, ShieldCheck } from 'lucide
 import { farmState } from '../lib/cropsmart-model'
 import { useResearchContext } from '../lib/research-context'
 import {
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
   buildTwinState,
   exportTwinStateJson,
   listTwinStates,
@@ -95,6 +96,8 @@ export function TwinStateWorkspace() {
         </button>
       </div>
     </header>
+
+    <ResearchWorkspaceGrammar active={['Context','Evidence / Observations','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} />
 
     {error && <div className="state-error"><strong>State engine error</strong><span>{error}</span></div>}
 
