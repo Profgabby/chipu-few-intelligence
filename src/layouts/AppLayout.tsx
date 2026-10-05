@@ -1,11 +1,58 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Activity, BarChart3, BookOpen, Building2, Database, Droplets, Gauge, Globe2, HeartHandshake, HelpCircle, LayoutDashboard, Menu, Radio, Settings, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
+import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, Globe2, HeartHandshake, LayoutDashboard, Menu, Radio, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { ResearchContextProvider } from '../lib/research-context'
 import { ResearchContextBar } from '../components/ResearchContextBar'
-import { CHIPU_MODULES, CHIPU_PRODUCT, CHIPU_UTILITY_NAV, type ChipuModuleId } from '../lib/chipu-modules'
-const moduleIcons:Record<ChipuModuleId,ComponentType<{size?:number}>>={twin:Activity,predict:TrendingUp,food:Sprout,energy:Zap,water:Droplets,people:HeartHandshake,place:Globe2,control:Gauge,economics:BarChart3,resilience:ShieldCheck}
-const utilityIcons:Record<string,ComponentType<{size?:number}>>={data:Database,reports:BookOpen,settings:Settings,administration:Building2,help:HelpCircle}
-const researchTools=[['/app/field-data','Field Data & Sensors',Database],['/app/telemetry','Telemetry Gateway',Radio],['/app/scenarios','Scenario Laboratory',ShieldCheck],['/app/uncertainty','Uncertainty Explorer',TrendingUp],['/app/experiments','Experiment Registry',BookOpen],['/app/methods','Models & Methods',BookOpen],['/app/calibration-validation','Model Calibration',Activity]] as const
-function Sidebar({onNavigate}:{onNavigate?:()=>void}){return <aside className="sidebar"><div className="sidebar-brand"><span className="brand-mark">CF</span><div><strong>{CHIPU_PRODUCT.name}</strong><small>{CHIPU_PRODUCT.descriptor}</small></div></div><div className="sidebar-label">Decision system</div><nav className="sidebar-nav"><NavLink to="/app" end onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><LayoutDashboard size={16}/><span>Overview</span></NavLink>{CHIPU_MODULES.map(module=>{const Icon=moduleIcons[module.id];return <NavLink key={module.id} to={module.route} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{module.shortName}</span></NavLink>})}</nav><div className="sidebar-label">Platform utilities</div><nav className="sidebar-nav">{CHIPU_UTILITY_NAV.map(item=>{const Icon=utilityIcons[item.id];return <NavLink key={item.id} to={item.route} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{item.label}</span></NavLink>})}</nav><div className="sidebar-label">Research infrastructure</div><nav className="sidebar-nav sidebar-nav-secondary">{researchTools.map(([to,label,Icon])=><NavLink key={to} to={to} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{label}</span></NavLink>)}</nav><div className="sidebar-footer"><div className="avatar">R</div><div><strong>Research workspace</strong><small>Evidence-aware decision support</small></div></div></aside>}
-export function AppLayout(){const[mobileOpen,setMobileOpen]=useState(false);return <ResearchContextProvider><div className="app-shell"><div className="mobile-header"><button className="icon-button" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={19}/></button><strong>{CHIPU_PRODUCT.shortName}</strong></div><div className={`mobile-drawer ${mobileOpen?'mobile-drawer-open':''}`}><div className="mobile-drawer-top"><strong>Navigation</strong><button className="icon-button" onClick={()=>setMobileOpen(false)} aria-label="Close navigation"><X size={18}/></button></div><Sidebar onNavigate={()=>setMobileOpen(false)}/></div><div className="desktop-sidebar"><Sidebar/></div><main className="app-main"><ResearchContextBar/><Outlet/></main></div></ResearchContextProvider>}
+import { CHIPU_PRODUCT } from '../lib/chipu-modules'
+
+type NavItem = readonly [string,string,ComponentType<{size?:number}>]
+type NavGroup = { label:string; items:readonly NavItem[] }
+
+const groups:readonly NavGroup[]=[
+  {label:'Research system',items:[
+    ['/app','Overview',LayoutDashboard],
+    ['/app/data','Data & Context',Database],
+    ['/app/twin','Digital Twin',Activity],
+    ['/app/predict','Prediction',TrendingUp],
+  ]},
+  {label:'FEW intelligence',items:[
+    ['/app/food','Food / Crop',Sprout],
+    ['/app/water','Water',Droplets],
+    ['/app/energy','Energy',Zap],
+    ['/app/control','Scenarios & Control',Gauge],
+    ['/app/economics','Economics',BarChart3],
+    ['/app/resilience','Resilience',ShieldCheck],
+  ]},
+  {label:'Research evidence',items:[
+    ['/app/field-data','Field Data & Sensors',Database],
+    ['/app/telemetry','Telemetry',Radio],
+    ['/app/experiments','Experiments',BookOpen],
+    ['/app/methods','Models & Methods',BookOpen],
+    ['/app/calibration-validation','Calibration & Validation',Activity],
+    ['/app/reports','Evidence & Exports',ShieldCheck],
+  ]},
+  {label:'Research context',items:[
+    ['/app/people','People',HeartHandshake],
+    ['/app/place','Place / Land',Globe2],
+  ]},
+] as const
+
+function Sidebar({onNavigate}:{onNavigate?:()=>void}){
+  return <aside className="sidebar">
+    <div className="sidebar-brand"><span className="brand-mark">CF</span><div><strong>{CHIPU_PRODUCT.name}</strong><small>Integrated FEW research platform</small></div></div>
+    <nav className="research-nav" aria-label="Research workspaces">
+      {groups.map(group=><section className="research-nav-group" key={group.label}><div className="sidebar-label">{group.label}</div>{group.items.map(([to,label,Icon])=><NavLink key={to} to={to} end={to==='/app'} onClick={onNavigate} className={({isActive})=>`nav-item ${isActive?'nav-item-active':''}`}><Icon size={16}/><span>{label}</span></NavLink>)}</section>)}
+    </nav>
+    <div className="sidebar-footer"><div className="avatar">R</div><div><strong>Research workspace</strong><small>Traceable · reproducible · evidence-aware</small></div></div>
+  </aside>
+}
+
+export function AppLayout(){
+  const[mobileOpen,setMobileOpen]=useState(false)
+  return <ResearchContextProvider><div className="app-shell">
+    <div className="mobile-header"><button className="icon-button" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={19}/></button><strong>{CHIPU_PRODUCT.shortName}</strong></div>
+    <div className={`mobile-drawer ${mobileOpen?'mobile-drawer-open':''}`}><div className="mobile-drawer-top"><strong>Research workspaces</strong><button className="icon-button" onClick={()=>setMobileOpen(false)} aria-label="Close navigation"><X size={18}/></button></div><Sidebar onNavigate={()=>setMobileOpen(false)}/></div>
+    <div className="desktop-sidebar"><Sidebar/></div>
+    <main className="app-main"><ResearchContextBar/><Outlet/></main>
+  </div></ResearchContextProvider>
+}
