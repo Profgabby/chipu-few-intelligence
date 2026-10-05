@@ -9,7 +9,7 @@ import { DecisionEvidenceGraph } from './DecisionEvidenceGraph'
 
 type Card = { id:string; title:string; kicker:string; route:string; icon:typeof Activity; status:string; action:string }
 export function ChipuOverviewWorkspace() {
-  const { farmId, zoneId, scenario, workspaceName } = useResearchContext()
+  const { farmId, zoneId, scenario } = useResearchContext()
   const [state,setState]=useState<CommandCenterState|null>(null)
   const [busy,setBusy]=useState(false)
   const refresh=async()=>{setBusy(true);try{setState(await loadCommandCenterState(farmId))}finally{setBusy(false)}}
@@ -37,7 +37,7 @@ export function ChipuOverviewWorkspace() {
     </header>
 
     <section className="overview-summary" aria-label="Active research context">
-      <div><span>ACTIVE CONTEXT</span><strong>{workspaceName}</strong><small>{farmId} · {zoneId} · {scenario}</small></div>
+      <div><span>ACTIVE CONTEXT</span><strong>Research workspace</strong><small>{farmId} · {zoneId} · {scenario}</small></div>
       <div><span>EVIDENCE</span><strong>{ready}/5 downstream results</strong><small>{state?.connected?'Research persistence connected':'Local research session'}</small></div>
       <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Not built'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Build from documented observations'}</small></div>
     </section>
