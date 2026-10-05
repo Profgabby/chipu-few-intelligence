@@ -2,6 +2,7 @@ import { useEffect,useState } from 'react'
 import { BatteryCharging, Play, SunMedium, Zap } from 'lucide-react'
 import { runEnergyAnalysis,type EnergyAnalysisResult } from '../lib/energy-intelligence-engine'
 import { listTwinStates,type TwinStateEstimate } from '../lib/state-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 export function EnergyIntelligenceWorkspace(){
  const [states,setStates]=useState<TwinStateEstimate[]>([]); const [stateId,setStateId]=useState(''); const [result,setResult]=useState<EnergyAnalysisResult|null>(null); const [busy,setBusy]=useState(false); const [error,setError]=useState('')
@@ -9,6 +10,7 @@ export function EnergyIntelligenceWorkspace(){
  async function run(){if(!stateId){setError('Create a Twin State first.');return}setBusy(true);setError('');try{setResult(await runEnergyAnalysis({stateId}))}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}}
  return <div className="energy-engine-workspace">
   <section className="energy-engine-hero"><div><span>WATER–ENERGY DIGITAL TWIN · RESEARCH DEMONSTRATION</span><h1>Energy Intelligence</h1><p>Connect predicted electricity availability, irrigation pumping demand, battery reserve, and agricultural loads in one traceable energy balance.</p></div><div className="energy-engine-actions"><select value={stateId} onChange={e=>setStateId(e.target.value)}><option value="">Select Twin State</option>{states.map(s=><option key={s.id} value={s.id}>{s.id} · {s.evidenceMode}</option>)}</select><button onClick={run} disabled={busy}><Play size={15}/>{busy?'Analyzing…':'Run Energy Analysis'}</button></div></section>
+  <ResearchWorkspaceGrammar active={['Context','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} note="Energy analysis consumes Twin State, matching prediction when available, and Water Intelligence pumping demand. Demonstration parameters remain identified as assumptions." />
   {error&&<div className="energy-engine-warning">{error}</div>}
   {result&&<><section className="energy-engine-meta"><div><small>ANALYSIS</small><strong>{result.id}</strong></div><div><small>STATE</small><strong>{result.stateId}</strong></div><div><small>FORECAST</small><strong>{result.forecastId??'NONE'}</strong></div><div><small>WATER LINK</small><strong>{result.waterAnalysisId}</strong></div><div><small>EVIDENCE</small><strong>{result.evidenceMode}</strong></div><div><small>STATUS</small><strong>{result.status}</strong></div></section>
   {result.warnings.map(w=><div className="energy-engine-warning" key={w}>{w}</div>)}

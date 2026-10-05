@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Download, Play, RefreshCw } from 'lucide-react'
 import { exportForecastJson, listForecasts, runForecast, type ForecastRun } from '../lib/forecast-engine'
 import { listTwinStates, type TwinStateEstimate } from '../lib/state-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 function download(name: string, text: string) {
   const blob = new Blob([text], { type: 'application/json' })
@@ -37,6 +38,7 @@ export function ForecastWorkspace() {
       <div><span className="research-kicker">PREDICTIVE DIGITAL TWIN · RESEARCH DEMONSTRATION</span><h1>Forecast & Prediction</h1><p>State-initialized +24 / +48 / +72 hour trajectories with explicit issue time, forcing, lineage, and expanding uncertainty.</p></div>
       <div className="forecast-actions"><select value={selectedState} onChange={e=>setSelectedState(e.target.value)}><option value="">Select Twin State</option>{states.map(s=><option key={s.id} value={s.id}>{s.id} · {s.evidenceMode} · {s.aggregateQuality}</option>)}</select><button onClick={execute} disabled={busy}><Play size={15}/>{busy?'Running…':'Run 72 h Prediction'}</button><button onClick={()=>refresh()}><RefreshCw size={15}/>Refresh</button></div>
     </section>
+    <ResearchWorkspaceGrammar active={['Context','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} note="Prediction consumes a persisted Twin State. Deterministic demonstration forcing and expanding uncertainty remain explicitly identified." />
     {error && <div className="forecast-warning">{error}</div>}
     {active && <>
       <section className="forecast-meta"><div><small>PREDICTION ID</small><strong>{active.id}</strong></div><div><small>INITIAL STATE</small><strong>{active.initialStateId}</strong></div><div><small>ISSUED</small><strong>{new Date(active.issuedAt).toLocaleString()}</strong></div><div><small>EVIDENCE</small><strong>{active.evidenceMode}</strong></div><div><small>MODEL</small><strong>{active.modelVersion}</strong></div><div><small>STATUS</small><strong>{active.status}</strong></div></section>

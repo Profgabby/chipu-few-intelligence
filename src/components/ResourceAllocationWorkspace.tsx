@@ -2,6 +2,7 @@ import { useEffect,useState } from 'react'
 import { Play, Scale } from 'lucide-react'
 import { runResourceAllocation,type ResourceAllocationResult } from '../lib/resource-allocation-engine'
 import { listTwinStates,type TwinStateEstimate } from '../lib/state-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 function strategyLabel(value:string){return value.replace(/_/g,' ')}
 
@@ -11,6 +12,7 @@ export function ResourceAllocationWorkspace(){
  async function run(){if(!stateId){setError('Create a Twin State first.');return}setBusy(true);setError('');try{setResult(await runResourceAllocation({stateId}))}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}}
  return <div className="resource-allocation-workspace">
   <section className="resource-allocation-hero"><div><span>AGRICULTURAL-CONSEQUENCE-AWARE DECISION ANALYSIS</span><h1>Resource Allocation</h1><p>Compare alternative water–energy allocation strategies by their modeled agricultural consequences rather than by energy balance alone.</p></div><div className="resource-allocation-actions"><select value={stateId} onChange={e=>setStateId(e.target.value)}><option value="">Select Twin State</option>{states.map(s=><option key={s.id} value={s.id}>{s.id} · {s.evidenceMode}</option>)}</select><button onClick={run} disabled={busy}><Play size={15}/>{busy?'Evaluating…':'Compare Strategies'}</button></div></section>
+  <ResearchWorkspaceGrammar active={['Context','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} note="Control compares explicit allocation strategies and modeled consequences. A ranked research strategy is not an autonomous control command." />
   {error&&<div className="resource-allocation-warning">{error}</div>}
   {result&&<><section className="resource-allocation-meta"><div><small>ANALYSIS</small><strong>{result.id}</strong></div><div><small>STATE</small><strong>{result.stateId}</strong></div><div><small>WATER LINK</small><strong>{result.waterAnalysisId}</strong></div><div><small>ENERGY LINK</small><strong>{result.energyAnalysisId}</strong></div><div><small>EVIDENCE</small><strong>{result.evidenceMode}</strong></div><div><small>STATUS</small><strong>{result.status}</strong></div></section>
   {result.warnings.map(w=><div className="resource-allocation-warning" key={w}>{w}</div>)}

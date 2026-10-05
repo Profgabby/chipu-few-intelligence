@@ -9,6 +9,7 @@ import {
   type StateEvidenceMode,
   type TwinStateEstimate,
 } from '../lib/state-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 function download(name: string, content: string, type = 'application/json') {
   const link = document.createElement('a')
@@ -95,6 +96,8 @@ export function TwinStateWorkspace() {
         </button>
       </div>
     </header>
+
+    <ResearchWorkspaceGrammar active={['Context','Evidence / Observations','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} />
 
     {error && <div className="state-error"><strong>State engine error</strong><span>{error}</span></div>}
 

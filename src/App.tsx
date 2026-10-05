@@ -3,6 +3,7 @@ import { AppLayout } from './layouts/AppLayout'
 import { CropSmartWorkspace } from './components/CropSmartWorkspace'
 import { ChipuOverviewWorkspace } from './components/ChipuOverviewWorkspace'
 import { ChipuFoundationWorkspace } from './components/ChipuFoundationWorkspace'
+import { FoodResearchWorkspace } from './components/FoodResearchWorkspace'
 import { PeoplePlaceWorkspace } from './components/PeoplePlaceWorkspace'
 import { ResilienceWorkspace } from './components/ResilienceWorkspace'
 import { EconomicsWorkspace } from './components/EconomicsWorkspace'
@@ -31,7 +32,7 @@ export default function App() {
       <Route path="/app" element={<ChipuOverviewWorkspace/>}/>
       <Route path="/app/twin" element={<TwinStateWorkspace/>}/>
       <Route path="/app/predict" element={<ForecastWorkspace/>}/>
-      <Route path="/app/food" element={<ChipuFoundationWorkspace moduleId="food"/>}/>
+      <Route path="/app/food" element={<FoodResearchWorkspace/>}/>
       <Route path="/app/energy" element={<EnergyIntelligenceWorkspace/>}/>
       <Route path="/app/water" element={<WaterIntelligenceWorkspace/>}/>
       <Route path="/app/people" element={<PeoplePlaceWorkspace mode="people"/>}/>
