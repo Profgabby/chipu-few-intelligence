@@ -1,6 +1,6 @@
 ## Summary
 
-Describe the purpose of this change and the CropSmart module(s) affected.
+Describe the purpose of this change and the CHIPU-FEW module(s) affected.
 
 ## Verification
 
