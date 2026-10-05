@@ -38,13 +38,18 @@ export function ChipuOverviewWorkspace() {
   ],[state,zone,soil,tank,pv,battery,npv,resilienceIndex])
   const ready=cards.filter(card=>!['No data','NO DATA','NOT CONNECTED','PROTECTED'].includes(card.evidence||'')).length
   return <div className="workspace command-center">
-    <header className="command-hero">
-      <div className="command-hero-copy"><div className="eyebrow eyebrow-status"><span className="status-dot"/>INTEGRATED FEW COMMAND CENTER</div><h1>{CHIPU_PRODUCT.name}</h1><p>One research cockpit for context, system state, prediction, control, economics and resilience—without invented production values.</p><div className="command-context-line"><span>{workspaceName}</span><i/> <span>{farmId}</span><i/> <span>{zoneId}</span><i/> <span>{scenario}</span></div></div>
-      <button className="command-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh evidence'}</button>
+    <header className="console-heading">
+      <div><div className="eyebrow">INTEGRATED FEW RESEARCH CONSOLE</div><h1>System overview</h1><p>{CHIPU_PRODUCT.name} · observation-informed state, prediction, allocation and consequence analysis.</p></div>
+      <button className="console-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={14} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh evidence'}</button>
     </header>
 
-    <section className="command-ribbon">
-      <div><span>RESEARCH CONTEXT</span><strong>People + Place</strong></div><ArrowRight/><div><span>RESOURCE SYSTEM</span><strong>Food ↔ Energy ↔ Water</strong></div><ArrowRight/><div><span>STATE</span><strong>Twin</strong></div><ArrowRight/><div><span>ANTICIPATE</span><strong>Predict</strong></div><ArrowRight/><div><span>ACT</span><strong>Control</strong></div><ArrowRight/><div><span>CONSEQUENCE</span><strong>Economics + Resilience</strong></div>
+    <section className="system-chain" aria-label="CHIPU-FEW analytical chain">
+      <div><span>01</span><small>CONTEXT</small><strong>People · Place</strong></div><ArrowRight/>
+      <div><span>02</span><small>COUPLED FEW</small><strong>Food ↔ Water ↔ Energy</strong></div><ArrowRight/>
+      <div><span>03</span><small>STATE</small><strong>Digital Twin</strong></div><ArrowRight/>
+      <div><span>04</span><small>ANTICIPATE</small><strong>Prediction + uncertainty</strong></div><ArrowRight/>
+      <div><span>05</span><small>DECIDE</small><strong>Scenario + control</strong></div><ArrowRight/>
+      <div><span>06</span><small>CONSEQUENCE</small><strong>Economics · Resilience</strong></div>
     </section>
 
     <section className="command-intelligence-strip">
@@ -54,8 +59,10 @@ export function ChipuOverviewWorkspace() {
       <div><CircleAlert size={18}/><span>DATA BOUNDARY</span><strong>Measured / modeled / synthetic kept distinct</strong></div>
     </section>
 
+    <section className="console-section-heading"><div><span>DEPENDENCY & PROVENANCE</span><h2>Decision evidence graph</h2></div><p>Trace available evidence, blocked dependencies and model lineage across the active research context.</p></section>
     <DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>
 
+    <section className="console-section-heading module-heading"><div><span>RESEARCH MODULES</span><h2>Analytical workspaces</h2></div><p>Open a subsystem to inspect inputs, method, outputs, uncertainty and provenance.</p></section>
     <section className="command-grid">{cards.map(({icon:Icon,...card})=><Link to={card.route} className={`command-card command-card-${card.id}`} key={card.id}><div className="command-card-top"><div className="command-card-icon"><Icon size={19}/></div><div><span>{card.kicker}</span><h2>{card.title}</h2></div>{card.evidence&&<em>{card.evidence}</em>}</div><div className="command-card-signal"><strong>{card.status}</strong><p>{card.detail}</p></div><div className="command-card-action">{card.action}<ArrowRight size={15}/></div></Link>)}</section>
 
     {state?.errors.length?<section className="command-note"><CircleAlert size={18}/><div><strong>Some evidence sources are unavailable.</strong><p>{state.errors.join(' · ')}. The command center leaves those modules unpopulated rather than substituting sample values.</p></div></section>:null}
