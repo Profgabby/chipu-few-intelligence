@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { readProfiles, validateProfile, type PlaceProfile } from './place-profile'
+import { readProfiles, validateProfile, unconfigured, initialProfileId, type PlaceProfile } from './place-profile'
 import { farmState } from './cropsmart-model'
 
 type Value = {
@@ -29,16 +29,16 @@ const write = (key: string, value: string) => { if (typeof sessionStorage !== 'u
 
 export function ResearchContextProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState(readProfiles)
-  const [profileId, setProfileId] = useState(() => read('chipu_place_active_v1', 'CEDAR-CREEK'))
-  const profile = profiles.find(p => p.id === profileId) ?? profiles[0]
+  const [profileId, setProfileId] = useState(() => initialProfileId(profiles, read('chipu_place_active_v2', ''), read('chipu_place_active_v1', '')))
+  const profile = profiles.find(p => p.id === profileId) ?? unconfigured
   const workspaceId = 'RESEARCH-WORKSPACE'
   const workspaceName = 'Research Workspace'
   const [farmIdState, setFarmIdState] = useState(profile.id)
   const [siteIdState, setSiteIdState] = useState(profile.id)
   const [zoneIdState, setZoneIdState] = useState(profile.zone)
   const [scenarioState, setScenarioState] = useState(() => read('chipu_context_scenario', farmState.scenario))
-  const [stateRun, setStateRun] = useState(farmState.stateRun)
-  const [predictionRun, setPredictionRun] = useState(farmState.predictionRun)
+  const [stateRun, setStateRun] = useState('')
+  const [predictionRun, setPredictionRun] = useState('')
   const setFarmId = (value: string) => { setFarmIdState(value); write('chipu_context_farm', value) }
   const setSiteId = (value: string) => { setSiteIdState(value); write('chipu_context_site', value) }
   const setZoneId = (value: string) => { setZoneIdState(value); write('chipu_context_zone', value) }
@@ -46,7 +46,7 @@ export function ResearchContextProvider({ children }: { children: ReactNode }) {
   const selectProfile = (id: string) => {
     const next = profiles.find(p => p.id === id)
     if (!next) return
-    setProfileId(id); write('chipu_place_active_v1', id)
+    setProfileId(id); write('chipu_place_active_v2', id)
     setFarmId(id); setSiteId(id); setZoneId(next.zone); setScenario('S00')
     setStateRun(''); setPredictionRun('')
   }
@@ -55,7 +55,7 @@ export function ResearchContextProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error(error)
     const updated = [...profiles.filter(p => p.id !== next.id), next]
     localStorage.setItem('chipu_place_profiles_v1', JSON.stringify(updated.filter(p => p.kind === 'configured')))
-    setProfiles(updated); setProfileId(next.id); write('chipu_place_active_v1', next.id)
+    setProfiles(updated); setProfileId(next.id); write('chipu_place_active_v2', next.id)
     setFarmId(next.id); setSiteId(next.id); setZoneId(next.zone); setScenario('S00'); setStateRun(''); setPredictionRun('')
   }
   const value = useMemo(() => ({ profiles, profile, selectProfile, saveProfile, workspaceId, workspaceName, farmId: farmIdState, setFarmId, siteId: siteIdState, setSiteId, zoneId: zoneIdState, setZoneId, scenario: scenarioState, setScenario, stateRun, predictionRun, setStateRun, setPredictionRun }), [profiles, profileId, farmIdState, siteIdState, zoneIdState, scenarioState, stateRun, predictionRun])
