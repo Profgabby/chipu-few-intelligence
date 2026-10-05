@@ -58,7 +58,7 @@ export function ChipuOverviewWorkspace() {
     </Link>)}</section>
 
     <section className="overview-analysis">
-      <div className="console-section-heading"><div><span>PROVENANCE</span><h2>Decision evidence</h2></div></section>
+      <div className="console-section-heading"><div><span>PROVENANCE</span><h2>Decision evidence</h2></div></div>
       <DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>
     </section>
 
