@@ -15,11 +15,11 @@ export async function loadCommandCenterState(farmId?:string):Promise<CommandCent
   const scenarioRows=await safe('Scenario history',()=>listScenarioRuns(20),errors)??[]
   const forecastControlRows=await safe('Forecast-driven control history',()=>listForecastControlRuns(20),errors)??[]
   const rollingRows=await safe('Receding-horizon control history',()=>listRecedingHorizonRuns(20),errors)??[]
-  const twin=twinRows.find(row=>!farmId||row.farmId===farmId)??twinRows[0]
-  const forecast=forecastRows.find(row=>!farmId||row.farmId===farmId)??forecastRows[0]
-  const recedingHorizonRun=rollingRows.find(row=>!forecast||row.forecastId===forecast.id)??rollingRows[0]
-  const forecastControlRun=forecastControlRows.find(row=>!forecast||row.forecastId===forecast.id)??forecastControlRows[0]
-  const legacyScenarioRun=scenarioRows.find(row=>!farmId||row.stateId===twin?.id)??scenarioRows[0]
+  const twin=twinRows.find(row=>!farmId||row.farmId===farmId)
+  const forecast=forecastRows.find(row=>!farmId||row.farmId===farmId)
+  const recedingHorizonRun=forecast ? rollingRows.find(row=>row.forecastId===forecast.id) : undefined
+  const forecastControlRun=forecast ? forecastControlRows.find(row=>row.forecastId===forecast.id) : undefined
+  const legacyScenarioRun=twin ? scenarioRows.find(row=>row.stateId===twin.id) : undefined
   const scenarioRun:ControlRun|undefined=recedingHorizonRun??forecastControlRun??legacyScenarioRun
   const connected=hasResearchSession()
   let stakeholderCount:number|null=null,placeCount:number|null=null
