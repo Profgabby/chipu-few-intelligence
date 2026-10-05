@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Activity, ArrowRight, BrainCircuit, CircleAlert, Droplets, Gauge, RefreshCw, Sprout, Sun } from 'lucide-react'
-import { CHIPU_PRODUCT } from '../lib/chipu-modules'
 import { getZone } from '../lib/cropsmart-model'
 import { loadCommandCenterState, stateComponent, type CommandCenterState } from '../lib/command-center-engine'
 import { useResearchContext } from '../lib/research-context'
@@ -23,7 +22,7 @@ export function ChipuOverviewWorkspace() {
     {id:'energy',title:'Energy',kicker:'PV + STORAGE + LOADS',route:'/app/energy',icon:Sun,status:pv?.value!==null&&pv?.value!==undefined?`${pv.value} ${pv.unit}`:'Awaiting Twin state',action:'Open Energy'},
     {id:'twin',title:'Digital Twin',kicker:'SYSTEM STATE',route:'/app/twin',icon:Activity,status:state?.twin?`${state.twin.completeness}% complete`:'No state yet',action:state?.twin?'Inspect state':'Build Twin'},
     {id:'predict',title:'Prediction',kicker:'FORECAST + UNCERTAINTY',route:'/app/predict',icon:BrainCircuit,status:state?.forecast?`${state.forecast.horizonHours} h horizon`:'No forecast yet',action:state?.forecast?'Inspect forecast':'Run model'},
-    {id:'control',title:'Scenarios & Control',kicker:'ALLOCATION + DECISION',route:'/app/control',icon:Gauge,status:state?.scenarioRun?`Best: ${state.scenarioRun.bestStrategy}`:'No run yet',action:state?.scenarioRun?'Inspect run':'Run scenario'},
+    {id:'control',title:'Scenarios & Control',kicker:'ALLOCATION + DECISION',route:'/app/control',icon:Gauge,status:state?.scenarioRun?'Decision run available':'No run yet',action:state?.scenarioRun?'Inspect run':'Run scenario'},
   ],[state,zone,soil,pv])
   const ready=[state?.twin,state?.forecast,state?.scenarioRun,state?.latestEconomic,state?.latestResilience].filter(Boolean).length
   return <div className="workspace command-center">
