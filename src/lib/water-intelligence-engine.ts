@@ -46,7 +46,7 @@ export async function latestWaterInputs() {
 
 export async function runWaterAnalysis(options: {
   stateId?: string
-  forecastId?: string
+  forecastId?: string | null
   targetWater?: number
   irrigationEfficiency?: number
   areaM2?: number
@@ -55,9 +55,12 @@ export async function runWaterAnalysis(options: {
   const state = options.stateId ? await getTwinState(options.stateId) : latestState
   if (!state) throw new Error('A persisted Twin State is required before Water Intelligence can run.')
 
-  const forecast: ForecastRun | undefined = options.forecastId
+  const forecast: ForecastRun | undefined = options.forecastId === null ? undefined : options.forecastId
     ? (await listForecasts(50)).find(f => f.id === options.forecastId)
     : latestForecast?.initialStateId === state.id ? latestForecast : undefined
+
+  if (options.forecastId && !forecast) throw new Error('Selected forecast is unavailable.')
+  if (forecast && (forecast.initialStateId !== state.id || forecast.farmId !== state.farmId || forecast.zoneId !== state.zoneId)) throw new Error('Forecast must match the selected Twin State, site and zone.')
 
   const rootZoneWater = value(state, 'soil_water_rootzone')
   const tankLevel = value(state, 'tank_level')
