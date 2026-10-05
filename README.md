@@ -59,6 +59,18 @@ The prototype is intended to support investigation of how agricultural decision 
 
 Agrivoltaics can serve as one application environment for this broader framework, but the architecture is designed around transferable food–energy–water decision methods rather than a single technology or farm configuration.
 
+## Research documentation
+
+For source-level scope, methods and claim boundaries, see:
+
+- [Research architecture](docs/ARCHITECTURE.md)
+- [Source-level capability audit](docs/CHIPU_FEW_SOURCE_AUDIT.md)
+- [Evidence and provenance](docs/EVIDENCE_AND_PROVENANCE.md)
+- [Model and method matrix](docs/MODEL_METHOD_MATRIX.md)
+- [Implemented vs. research-stage status](docs/IMPLEMENTATION_STATUS.md)
+- [CropSmart → CHIPU-FEW evolution](docs/CROPSMART_TO_CHIPU_FEW_EVOLUTION.md)
+- [Screenshot and demonstration evidence guide](docs/SCREENSHOTS.md)
+
 ## Development
 
 ```bash
