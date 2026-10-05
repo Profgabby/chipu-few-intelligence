@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, LayoutDashboard, Menu, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { ResearchContextProvider } from '../lib/research-context'
+import { PlaceContextBoundary } from '../components/PlaceContextBoundary'
 import { ResearchContextBar } from '../components/ResearchContextBar'
 import { CHIPU_PRODUCT } from '../lib/chipu-modules'
 
@@ -12,6 +13,7 @@ const groups:readonly NavGroup[]=[
   {label:'Research system',items:[
     ['/app','Overview',LayoutDashboard],
     ['/app/data','Data & Context',Database],
+    ['/app/location','Location & System',Database],
     ['/app/twin','Digital Twin',Activity],
     ['/app/predict','Prediction',TrendingUp],
   ]},
@@ -45,6 +47,6 @@ export function AppLayout(){
     <div className="mobile-header"><button className="icon-button" onClick={()=>setMobileOpen(true)} aria-label="Open navigation"><Menu size={19}/></button><strong>{CHIPU_PRODUCT.shortName}</strong></div>
     <div className={`mobile-drawer ${mobileOpen?'mobile-drawer-open':''}`}><div className="mobile-drawer-top"><strong>Research workspaces</strong><button className="icon-button" onClick={()=>setMobileOpen(false)} aria-label="Close navigation"><X size={18}/></button></div><Sidebar onNavigate={()=>setMobileOpen(false)}/></div>
     <div className="desktop-sidebar"><Sidebar/></div>
-    <main className="app-main"><ResearchContextBar/><Outlet/></main>
+    <main className="app-main"><ResearchContextBar/><PlaceContextBoundary/></main>
   </div></ResearchContextProvider>
 }

@@ -1,3 +1,4 @@
+import { LocationWorkspace } from './components/LocationWorkspace'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
 import { CropSmartWorkspace } from './components/CropSmartWorkspace'
@@ -29,6 +30,7 @@ export default function App() {
     <Route path="/" element={<Navigate to="/app" replace/>}/>
     <Route path="/overview" element={<Navigate to="/app" replace/>}/>
     <Route element={<AppLayout/>}>
+      <Route path="/app/location" element={<LocationWorkspace/>}/>
       <Route path="/app" element={<ChipuOverviewWorkspace/>}/>
       <Route path="/app/twin" element={<TwinStateWorkspace/>}/>
       <Route path="/app/predict" element={<ForecastWorkspace/>}/>
