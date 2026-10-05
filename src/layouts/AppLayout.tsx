@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, Globe2, HeartHandshake, LayoutDashboard, Menu, Radio, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
+import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, LayoutDashboard, Menu, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { ResearchContextProvider } from '../lib/research-context'
 import { ResearchContextBar } from '../components/ResearchContextBar'
@@ -23,17 +23,9 @@ const groups:readonly NavGroup[]=[
     ['/app/economics','Economics',BarChart3],
     ['/app/resilience','Resilience',ShieldCheck],
   ]},
-  {label:'Research evidence',items:[
-    ['/app/field-data','Field Data & Sensors',Database],
-    ['/app/telemetry','Telemetry',Radio],
+  {label:'Research',items:[
     ['/app/experiments','Experiments',BookOpen],
-    ['/app/methods','Models & Methods',BookOpen],
-    ['/app/calibration-validation','Calibration & Validation',Activity],
-    ['/app/reports','Evidence & Exports',ShieldCheck],
-  ]},
-  {label:'Research context',items:[
-    ['/app/people','People',HeartHandshake],
-    ['/app/place','Place / Land',Globe2],
+    ['/app/methods','Methods & Evidence',BookOpen],
   ]},
 ] as const
 
