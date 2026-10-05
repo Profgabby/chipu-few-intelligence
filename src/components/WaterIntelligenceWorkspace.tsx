@@ -3,6 +3,7 @@ import { Droplets, Play, RefreshCw } from 'lucide-react'
 import { runWaterAnalysis, type WaterAnalysisResult } from '../lib/water-intelligence-engine'
 import { listTwinStates, type TwinStateEstimate } from '../lib/state-engine'
 import { listForecasts, type ForecastRun } from '../lib/forecast-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 export function WaterIntelligenceWorkspace() {
   const [states,setStates]=useState<TwinStateEstimate[]>([])
@@ -29,6 +30,7 @@ export function WaterIntelligenceWorkspace() {
   }
 
   return <div className="water-engine-workspace">
+    <ResearchWorkspaceGrammar active={['Context','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} note="Water calculations consume persisted state and, when available, a matching prediction. Missing flow or pump-power evidence remains missing." />
     <section className="water-hero"><div><span className="research-kicker">OBSERVATION-INFORMED WATER INTELLIGENCE</span><h1>Water Intelligence</h1><p>Translate Twin State and prediction outputs into transparent irrigation demand, volume, runtime, and pumping-energy calculations.</p></div><div className="water-actions"><select value={stateId} onChange={e=>setStateId(e.target.value)}><option value="">Select Twin State</option>{states.map(s=><option key={s.id} value={s.id}>{s.id} · {s.evidenceMode}</option>)}</select><select value={forecastId} onChange={e=>setForecastId(e.target.value)}><option value="">No forecast</option>{forecasts.map(f=><option key={f.id} value={f.id}>{f.id}</option>)}</select><button onClick={execute} disabled={busy}><Play size={15}/>{busy?'Running…':'Run Water Analysis'}</button><button onClick={()=>refresh()}><RefreshCw size={15}/>Refresh</button></div></section>
     {error&&<div className="water-warning">{error}</div>}
     {result&&<>
