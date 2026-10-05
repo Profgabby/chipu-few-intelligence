@@ -95,9 +95,7 @@ export function TwinStateWorkspace() {
           <RefreshCw size={14} />{busy ? 'Building state…' : 'Run State Update'}
         </button>
       </div>
-    </header>
-
-    <ResearchWorkspaceGrammar active={['Context','Evidence / Observations','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} />
+    </header><ResearchWorkspaceGrammar active={['Context','Evidence / Observations','Inputs','Method / Model','State / Indicators','FEW Dependencies','Outputs','Uncertainty','Provenance']} />
 
     {error && <div className="state-error"><strong>State engine error</strong><span>{error}</span></div>}
 

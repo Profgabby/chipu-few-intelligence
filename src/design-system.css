@@ -1,0 +1,95 @@
+/* Shared visual contract. Imported last; domain layouts and scientific semantics stay intact. */
+:root {
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --surface: #fff; --surface-subtle: #f7f8f4; --border: #d5dfd8;
+  --text-primary: #19372c; --text-secondary: #52665c;
+  --brand: #006b3c; --brand-deep: #004c2d; --accent: #fdb515;
+  --status-valid: #17603c; --status-valid-bg: #eaf5ee;
+  --status-context: #255c85; --status-context-bg: #edf4fa;
+  --status-partial: #78520a; --status-partial-bg: #fff5db;
+  --status-protected: #685080; --status-protected-bg: #f3edf8;
+  --status-missing: #52615a; --status-missing-bg: #eef1ef;
+  --status-failed: #a12c32; --status-failed-bg: #fff0f0;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px;
+  --radius-control: 6px; --radius-panel: 10px;
+  --elevation-overlay: 0 8px 24px rgb(25 55 44 / 12%);
+  /* Compatibility aliases keep existing workspaces on the same palette. */
+  --ink: var(--text-primary); --muted: var(--text-secondary); --line: var(--border);
+  --panel: var(--surface); --green: var(--brand); --green-soft: var(--status-valid-bg);
+  --amber: var(--status-partial); --amber-soft: var(--status-partial-bg); --red: var(--status-failed);
+  --cs-ink: var(--text-primary); --cs-muted: var(--text-secondary); --cs-border: var(--border);
+  --cs-surface: var(--surface); --cs-canvas: var(--surface-subtle); --cs-green-700: var(--brand);
+  --cs-gold: var(--accent); --cs-shadow: none; --cs-shadow-soft: none; --cs-radius: var(--radius-panel);
+}
+body, button, input, select, textarea { font-family: var(--font-ui); }
+body, .app-shell { background: var(--surface-subtle); color: var(--text-primary); font-size: 15px; line-height: 1.55; }
+code, pre, .mono, .metric-value, .metric-meta, .context-bar { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.workspace { padding: var(--space-8); }
+.console-heading h1, .workspace-header h1 { font-size: clamp(30px, 3vw, 40px); font-weight: 700; line-height: 1.15; letter-spacing: -.035em; }
+.console-heading p, .workspace-header p { font-size: 15px; line-height: 1.6; color: var(--text-secondary); }
+.console-section-heading h2, .research-section-heading h2 { font-size: 26px; line-height: 1.25; font-weight: 650; }
+.panel-header h2, .command-card-top h2 { font-size: 19px; line-height: 1.3; font-weight: 600; }
+.eyebrow, .console-section-heading span, .command-card-top span, .overview-summary span,
+.system-chain small, .research-grammar-step span, .research-section-heading span,
+.research-fact-grid span, .research-dependency-grid span, th {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 600; letter-spacing: .07em; color: var(--text-secondary);
+}
+.metric-top .eyebrow, .metric-card .eyebrow { font: 500 12px var(--font-mono); letter-spacing: .02em; }
+.metric-label, .list-row, table, .detail-grid { font-size: 14px; }
+.metric-meta, .metric-value small, .muted, .workspace-footer, .research-grammar > p,
+.research-fact-grid small, .research-observation-list small, .research-indicator-list small { font-size: 12px; color: var(--text-secondary); }
+.sidebar { background: var(--brand-deep); border-right: 2px solid var(--accent); }
+.sidebar-brand strong { font-size: 18px; }
+.sidebar-brand small, .sidebar-footer small { font-size: 12px; color: #c5d9ce; }
+.sidebar-label { font-size: 11px; color: #b6cec0; }
+.nav-item { font-size: 14px; min-height: 44px; box-shadow: none; }
+.context-bar { background: var(--surface); box-shadow: none; }
+.module-stack { gap: var(--space-6); }
+.panel, .metric-card, .command-card, .evidence-layer { border-radius: var(--radius-panel); box-shadow: none; }
+.panel:hover, .metric-card:hover, .command-card:hover { box-shadow: none; transform: none; }
+.panel-header, .panel-body { padding: var(--space-4) var(--space-6); }
+.command-grid-core { gap: var(--space-4); margin-bottom: var(--space-8); }
+.command-card { min-height: 180px; padding: var(--space-6); border-left: 1px solid var(--border); }
+.command-card:hover { border-color: var(--brand); background: #fafcf9; }
+.command-card-icon { border-radius: var(--radius-control); }
+.command-card-signal { margin: var(--space-4) 0; }
+.overview-summary { border: 0; border-top: 2px solid var(--brand); border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+.overview-summary > div { padding: var(--space-4) var(--space-6); }
+.system-chain { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; background: transparent; }
+.research-grammar { border-radius: 0; border-width: 1px 0; background: transparent; }
+.research-grammar-step-inactive { opacity: 1; background: var(--surface-subtle); }
+.research-fact-grid article { border: 0; border-left: 2px solid var(--border); border-radius: 0; background: transparent; }
+.evidence-layer-head { background: transparent; }
+.decision-readiness, .inspector-signal { border-radius: var(--radius-control); box-shadow: none; }
+.button, .console-refresh, .inspector-action, select, input { border-radius: var(--radius-control); font-size: 14px; min-height: 40px; }
+.button:hover { transform: none; box-shadow: none; }
+button:disabled { cursor: not-allowed; opacity: .6; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
+.sidebar :focus-visible { outline-color: var(--accent); }
+.research-status { display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 3px 7px; border-radius: 5px; font: 600 11px/1.4 var(--font-ui); text-transform: none; letter-spacing: 0; }
+.research-status svg { flex-shrink: 0; }
+.research-status-available, .quality-pass, .state-quality-pass, .state-chip-assimilated { color: var(--status-valid); background: var(--status-valid-bg); }
+.research-status-context { color: var(--status-context); background: var(--status-context-bg); }
+.research-status-partial, .quality-suspect, .quality-stale, .state-chip-stale, .state-quality-degraded { color: var(--status-partial); background: var(--status-partial-bg); }
+.research-status-protected { color: var(--status-protected); background: var(--status-protected-bg); }
+.research-status-missing, .state-chip-missing, .state-quality-unavailable { color: var(--status-missing); background: var(--status-missing-bg); }
+.research-status-failed, .quality-fail, .state-chip-rejected { color: var(--status-failed); background: var(--status-failed-bg); }
+.quality-pass::before { content: '✓ '; } .quality-suspect::before, .quality-stale::before { content: '△ '; } .quality-fail::before { content: '× '; }
+.evidence-node { border-radius: var(--radius-control); box-shadow: none; grid-template-columns: auto 1fr; }
+.evidence-node .research-status { grid-column: 1 / -1; font-size: 10px; padding: 2px 4px; }
+.evidence-node-copy em { font-size: 10px; color: var(--text-secondary); }
+.evidence-node-copy small { font-size: 11px; color: var(--text-secondary); }
+.evidence-node-missing { opacity: 1; }
+.evidence-node:hover, .evidence-node-selected { box-shadow: none; transform: translate(-50%, -50%); outline: 2px solid var(--brand); outline-offset: 2px; }
+.evidence-inspector dt, .inspector-title > div > span, .inspector-signal > span, .evidence-stage-band span { font-size: 11px; color: var(--text-secondary); }
+.evidence-inspector dd, .inspector-signal small, .lineage-pill, .evidence-legend span { font-size: 12px; }
+@media (max-width: 900px) { .workspace { padding: var(--space-6) var(--space-4); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+.state-quality-watch, .state-chip-held { color: var(--status-partial); background: var(--status-partial-bg); }
+.state-quality-insufficient { color: var(--status-missing); background: var(--status-missing-bg); }
+.state-quality-pass::before, .state-chip-assimilated::before { content: '✓ '; }
+.state-quality-watch::before, .state-chip-held::before { content: '△ '; }
+.state-quality-insufficient::before, .state-chip-missing::before { content: '○ '; }
+.state-chip-rejected::before { content: '× '; }
