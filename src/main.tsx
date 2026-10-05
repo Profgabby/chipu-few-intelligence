@@ -22,6 +22,7 @@ import './model-calibration-validation.css'
 import './field-sensor-integration.css'
 import './telemetry-gateway.css'
 import './research-platform.css'
+import './research-workspace.css'
 
 document.title = 'CHIPU-FEW Intelligence'
 const description = document.querySelector<HTMLMetaElement>('meta[name="description"]')
