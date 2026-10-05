@@ -3,13 +3,13 @@ import { CheckCircle2, Database, Download, RefreshCw, ShieldCheck } from 'lucide
 import { farmState } from '../lib/cropsmart-model'
 import { useResearchContext } from '../lib/research-context'
 import {
-import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
   buildTwinState,
   exportTwinStateJson,
   listTwinStates,
   type StateEvidenceMode,
   type TwinStateEstimate,
 } from '../lib/state-engine'
+import { ResearchWorkspaceGrammar } from './ResearchWorkspaceGrammar'
 
 function download(name: string, content: string, type = 'application/json') {
   const link = document.createElement('a')
