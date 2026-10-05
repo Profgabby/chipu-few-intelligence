@@ -1,4 +1,4 @@
-name: CropSmart Build Verification
+name: CHIPU-FEW Build Verification
 
 on:
   pull_request:
