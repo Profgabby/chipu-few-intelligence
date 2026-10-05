@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, BrainCircuit, CircleAlert, Database, Droplets, Gauge, RefreshCw, ShieldCheck, Sprout, Sun } from 'lucide-react'
+import { Activity, ArrowRight, BrainCircuit, CircleAlert, Droplets, Gauge, RefreshCw, Sprout, Sun } from 'lucide-react'
 import { CHIPU_PRODUCT } from '../lib/chipu-modules'
 import { getZone } from '../lib/cropsmart-model'
 import { loadCommandCenterState, stateComponent, type CommandCenterState } from '../lib/command-center-engine'
@@ -8,9 +8,6 @@ import { useResearchContext } from '../lib/research-context'
 import { DecisionEvidenceGraph } from './DecisionEvidenceGraph'
 
 type Card = { id:string; title:string; kicker:string; route:string; icon:typeof Activity; status:string; action:string }
-const value = (n: unknown) => typeof n === 'number' && Number.isFinite(n) ? n : null
-const money = (n: unknown) => value(n) === null ? null : Number(n).toLocaleString(undefined,{maximumFractionDigits:0})
-
 export function ChipuOverviewWorkspace() {
   const { farmId, zoneId, scenario, workspaceName } = useResearchContext()
   const [state,setState]=useState<CommandCenterState|null>(null)
@@ -19,11 +16,7 @@ export function ChipuOverviewWorkspace() {
   useEffect(()=>{void refresh()},[farmId,zoneId,scenario])
   const zone=getZone(zoneId)
   const soil=stateComponent(state?.twin,'soil_water_rootzone')
-  const tank=stateComponent(state?.twin,'tank_level')
   const pv=stateComponent(state?.twin,'pv_power')
-  const battery=stateComponent(state?.twin,'battery_soc')
-  const resilienceIndex=value(state?.latestResilience?.resilience_index)
-  const npv=money(state?.latestEconomic?.npv)
   const cards=useMemo<Card[]>(()=>[
     {id:'food',title:'Food',kicker:'CROP SYSTEM',route:'/app/food',icon:Sprout,status:`${zone.crop} · ${zone.stage}`,action:'Open Food'},
     {id:'water',title:'Water',kicker:'SOIL + IRRIGATION',route:'/app/water',icon:Droplets,status:soil?.value!==null&&soil?.value!==undefined?`${soil.value} ${soil.unit}`:'Awaiting Twin state',action:'Open Water'},
