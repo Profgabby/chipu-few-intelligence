@@ -3,6 +3,7 @@ import { useResearchContext } from '../lib/research-context'
 import { ResearchStatus } from './ResearchStatus'
 export function PlaceContextBoundary(){
  const { profile, zoneId, scenario }=useResearchContext();const {pathname}=useLocation()
+ if(pathname==='/app'||pathname==='/app/')return <Outlet key={profile.id}/>
  if(profile.kind==='unconfigured' && pathname!=='/app/location')return <div className="workspace"><header className="console-heading"><div><div className="eyebrow">CHIPU-FEW INTELLIGENCE</div><h1>Choose your research site</h1><p>Select a saved site or configure a location and system.</p></div></header><Link className="button button-primary" to="/app/location">Location & system</Link></div>
  const configure=['/app/economics','/app/location','/app/place','/app/people','/app/methods','/app/models-methods','/app/help'].includes(pathname)
  if(profile.kind==='demonstrator'||configure)return <Outlet key={profile.id}/>
