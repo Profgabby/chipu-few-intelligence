@@ -4,7 +4,7 @@ export type PlaceProfile = {
   latitude: string; longitude: string; elevation: string; timezone: string; currency: string;
   systemType: string; zone: string; experiment: string; crop: string;
   weather: string; soil: string; irrigation: string; pv: string; tariff: string;
-  calibration: string; units: 'SI'; kind: 'demonstrator' | 'configured';
+  calibration: string; units: 'SI'; kind: 'demonstrator' | 'configured' | 'unconfigured';
 }
 export const demonstration: PlaceProfile = { id: 'CEDAR-CREEK', name: 'Cedar Creek demonstrator', country: '', region: '', district: '', latitude: '', longitude: '', elevation: '', timezone: 'UTC', currency: 'USD', systemType: 'Agrivoltaics', zone: 'AV-A', experiment: '', crop: '', weather: '', soil: '', irrigation: '', pv: '', tariff: '', calibration: '', units: 'SI', kind: 'demonstrator' }
 export function blankProfile(country = 'US'): PlaceProfile {
@@ -25,4 +25,10 @@ export function validateProfile(p: PlaceProfile): string | null {
 }
 export function readProfiles(): PlaceProfile[] {
   try { const rows = JSON.parse(localStorage.getItem('chipu_place_profiles_v1') || '[]'); return [demonstration, ...(Array.isArray(rows) ? rows.filter((p: PlaceProfile) => p?.kind === 'configured' && typeof p.id === 'string' && !validateProfile(p)) : [])] } catch { return [demonstration] }
+}
+
+export const unconfigured: PlaceProfile = { ...demonstration, id: '', name: 'Select a site', zone: '', country: '', region: '', currency: '', kind: 'unconfigured' }
+export function initialProfileId(profiles: PlaceProfile[], current: string, legacy: string): string {
+  if (current && profiles.some(p=>p.id===current)) return current
+  return profiles.find(p=>p.id===legacy && p.kind==='configured')?.id ?? ''
 }
