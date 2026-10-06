@@ -4,6 +4,7 @@ import { Activity, ArrowRight, BrainCircuit, CircleAlert, Droplets, Gauge, Refre
 import { getZone } from '../lib/cropsmart-model'
 import { loadCommandCenterState, stateComponent, type CommandCenterState } from '../lib/command-center-engine'
 import { useResearchContext } from '../lib/research-context'
+import { OverviewResearchContent } from './OverviewResearchContent'
 import { DecisionEvidenceGraph } from './DecisionEvidenceGraph'
 
 type Card = { id:string; title:string; kicker:string; route:string; icon:typeof Activity; status:string; action:string }
@@ -12,7 +13,7 @@ export function ChipuOverviewWorkspace() {
   const [state,setState]=useState<CommandCenterState|null>(null)
   const [busy,setBusy]=useState(false)
   const hasEvidenceContext=profile.kind==='demonstrator'
-  const refresh=async()=>{if(!hasEvidenceContext){setState(null);return}setBusy(true);try{setState(await loadCommandCenterState(farmId))}finally{setBusy(false)}}
+  const refresh=async()=>{if(!hasEvidenceContext){setState(null);return}setBusy(true);try{setState(await loadCommandCenterState(farmId,zoneId))}finally{setBusy(false)}}
   useEffect(()=>{void refresh()},[farmId,zoneId,scenario,hasEvidenceContext])
   const zone=getZone(zoneId)
   const soil=stateComponent(state?.twin,'soil_water_rootzone')
@@ -26,7 +27,7 @@ export function ChipuOverviewWorkspace() {
     {id:'control',title:'Scenarios & Control',kicker:'ALLOCATION + DECISION',route:'/app/control',icon:Gauge,status:state?.scenarioRun?'Decision run available':'No run yet',action:state?.scenarioRun?'Inspect run':'Run scenario'},
   ],[state,zone,soil,pv,hasEvidenceContext])
   const ready=[state?.twin,state?.forecast,state?.scenarioRun,state?.latestEconomic,state?.latestResilience].filter(Boolean).length
-  return <div className="workspace command-center">
+  return <div className="workspace command-center research-instrument">
     <header className="console-heading">
       <div>
         <div className="eyebrow">CHIPU-FEW INTELLIGENCE</div>
@@ -38,19 +39,12 @@ export function ChipuOverviewWorkspace() {
     </header>
 
     <section className="overview-summary" aria-label="Active research context">
-      <div><span>ACTIVE CONTEXT</span><strong>{profile.kind==='unconfigured'?'No site selected':profile.name}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':`${profile.country} · ${profile.region} · ${zoneId}`}</small></div>
+      <div><span>ACTIVE CONTEXT</span><strong>{profile.kind==='unconfigured'?'No site selected':profile.name}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
       <div><span>EVIDENCE</span><strong>{ready}/5 downstream results</strong><small>{state?.connected?'Research persistence connected':'Local research session'}</small></div>
       <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Not built'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Build from documented observations'}</small></div>
     </section>
 
-    <section className="system-chain system-chain-compact" aria-label="CHIPU-FEW analytical chain">
-      <div><small>CONTEXT</small><strong>People + Place</strong></div><ArrowRight/>
-      <div><small>COUPLED FEW</small><strong>Food ↔ Water ↔ Energy</strong></div><ArrowRight/>
-      <div><small>STATE</small><strong>Digital Twin</strong></div><ArrowRight/>
-      <div><small>ANTICIPATE</small><strong>Prediction</strong></div><ArrowRight/>
-      <div><small>DECIDE</small><strong>Scenario + Control</strong></div><ArrowRight/>
-      <div><small>CONSEQUENCE</small><strong>Economics + Resilience</strong></div>
-    </section>
+    {hasEvidenceContext&&<OverviewResearchContent zoneId={zoneId} state={state}/>}
 
     <section className="console-section-heading module-heading"><div><span>CORE WORKSPACES</span><h2>Research system</h2></div></section>
     <section className="command-grid command-grid-core">{cards.map(({icon:Icon,...card})=><Link to={card.route} className={`command-card command-card-${card.id}`} key={card.id}>

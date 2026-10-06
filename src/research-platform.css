@@ -94,3 +94,23 @@ body{font-size:16px;background:linear-gradient(180deg,#f7faf8 0,#eef5f1 100%)}
   outline: 2px solid #000;
   outline-offset: 4px;
 }
+
+/* Compact research overview */
+.research-context-bar>a,.research-context-bar>a:visited{color:#006B3C;font-weight:600}
+.research-overview-grid{display:grid;grid-template-columns:minmax(280px,1fr) minmax(360px,1.5fr);gap:18px;margin:20px 0}
+.research-surface{background:#fff;border:1px solid #d4dfd9;padding:20px;min-width:0}
+.research-surface header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.research-surface h2{font-size:18px;margin:0;color:#173f31}
+.research-surface p,.research-surface small{font-size:12px;color:#52635a;line-height:1.5}
+.research-surface a,.research-surface a:visited{color:#006B3C;font-weight:600}
+.research-demo-label{font-size:11px;background:#fff2c7;color:#171717;padding:4px 7px}
+.dataset-facts{margin:0 0 16px}.dataset-facts>div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #edf1ee;padding:10px 0;font-size:13px}.dataset-facts dt{color:#52635a}.dataset-facts dd{margin:0;text-align:right;font-weight:600;overflow-wrap:anywhere}
+.overview-plot strong{font-size:12px}.overview-plot svg{display:block;width:100%;max-height:115px}.overview-plot text{font-size:11px;fill:#52635a}
+.analysis-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #edf1ee;font-size:13px}.analysis-row small{display:block;overflow-wrap:anywhere}
+.research-next-actions{padding-left:22px;margin:0}.research-next-actions li{padding:7px 0;font-size:14px}.research-next-actions small{display:block}
+.research-instrument .command-grid-core{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.research-instrument .command-card{min-height:0;padding:12px 14px;gap:9px;border-radius:5px;background:#fff;box-shadow:none}
+.research-instrument .command-card:before{background:#006B3C;width:2px}
+.research-instrument .command-card-top{gap:9px}.research-instrument .command-card-icon{width:30px;height:30px;border-radius:4px}.research-instrument .command-card-top h2{font-size:16px}.research-instrument .command-card-top span{font-size:9px}.research-instrument .command-card-signal{font-size:12px}.research-instrument .command-card-action{padding-top:7px;font-size:12px}
+@media(max-width:1000px){.research-overview-grid{grid-template-columns:1fr}.research-instrument .command-grid-core{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.research-instrument .command-grid-core{grid-template-columns:1fr}.research-surface{padding:14px}.dataset-facts>div{flex-wrap:wrap}.dataset-facts dd{text-align:left}}

@@ -8,15 +8,15 @@ import { hasResearchSession, listDomainRecords } from './chipu-domain-api'
 export type ControlRun=ScenarioExperimentRun|ForecastDrivenControlRun|RecedingHorizonControlRun
 export type CommandCenterState={loadedAt:string;connected:boolean;twin?:TwinStateEstimate;forecast?:ForecastRun;scenarioRun?:ControlRun;forecastControlRun?:ForecastDrivenControlRun;recedingHorizonRun?:RecedingHorizonControlRun;stakeholderCount:number|null;placeCount:number|null;latestResilience?:Record<string,unknown>;latestEconomic?:Record<string,unknown>;errors:string[]}
 async function safe<T>(label:string,task:()=>Promise<T>,errors:string[]):Promise<T|undefined>{try{return await task()}catch{errors.push(`${label} unavailable`);return undefined}}
-export async function loadCommandCenterState(farmId?:string):Promise<CommandCenterState>{
+export async function loadCommandCenterState(farmId?:string,zoneId?:string):Promise<CommandCenterState>{
   const errors:string[]=[]
   const twinRows=await safe('Twin state',()=>listTwinStates(20),errors)??[]
   const forecastRows=await safe('Forecast',()=>listForecasts(20),errors)??[]
   const scenarioRows=await safe('Scenario history',()=>listScenarioRuns(20),errors)??[]
   const forecastControlRows=await safe('Forecast-driven control history',()=>listForecastControlRuns(20),errors)??[]
   const rollingRows=await safe('Receding-horizon control history',()=>listRecedingHorizonRuns(20),errors)??[]
-  const twin=twinRows.find(row=>!farmId||row.farmId===farmId)
-  const forecast=forecastRows.find(row=>!farmId||row.farmId===farmId)
+  const twin=twinRows.find(row=>(!farmId||row.farmId===farmId)&&(!zoneId||row.zoneId===zoneId))
+  const forecast=forecastRows.find(row=>(!farmId||row.farmId===farmId)&&(!zoneId||row.zoneId===zoneId))
   const recedingHorizonRun=forecast ? rollingRows.find(row=>row.forecastId===forecast.id) : undefined
   const forecastControlRun=forecast ? forecastControlRows.find(row=>row.forecastId===forecast.id) : undefined
   const legacyScenarioRun=twin ? scenarioRows.find(row=>row.stateId===twin.id) : undefined
