@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { readProfiles, validateProfile, unconfigured, initialProfileId, type PlaceProfile } from './place-profile'
+import { readProfiles, validateProfile, unconfigured, demonstration, initialProfileId, type PlaceProfile } from './place-profile'
 import { farmState } from './cropsmart-model'
 
 type Value = {
@@ -25,18 +25,19 @@ type Value = {
 
 const Context = createContext<Value | null>(null)
 const read = (key: string, fallback: string) => typeof sessionStorage === 'undefined' ? fallback : sessionStorage.getItem(key) || fallback
-const write = (key: string, value: string) => { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, value) }
+const persist = (key: string, value: string) => { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, value) }
 
-export function ResearchContextProvider({ children }: { children: ReactNode }) {
+export function ResearchContextProvider({ children, demonstrationMode = false }: { children: ReactNode; demonstrationMode?: boolean }) {
+  const write = (key: string, value: string) => { if (!demonstrationMode) persist(key, value) }
   const [profiles, setProfiles] = useState(readProfiles)
-  const [profileId, setProfileId] = useState(() => initialProfileId(profiles, read('chipu_place_active_v2', ''), read('chipu_place_active_v1', '')))
+  const [profileId, setProfileId] = useState(() => demonstrationMode ? demonstration.id : initialProfileId(profiles, read('chipu_place_active_v2', ''), read('chipu_place_active_v1', '')))
   const profile = profiles.find(p => p.id === profileId) ?? unconfigured
   const workspaceId = 'RESEARCH-WORKSPACE'
   const workspaceName = 'Research Workspace'
   const [farmIdState, setFarmIdState] = useState(profile.id)
   const [siteIdState, setSiteIdState] = useState(profile.id)
   const [zoneIdState, setZoneIdState] = useState(profile.zone)
-  const [scenarioState, setScenarioState] = useState(() => read('chipu_context_scenario', farmState.scenario))
+  const [scenarioState, setScenarioState] = useState(() => demonstrationMode ? farmState.scenario : read('chipu_context_scenario', farmState.scenario))
   const [stateRun, setStateRun] = useState('')
   const [predictionRun, setPredictionRun] = useState('')
   const setFarmId = (value: string) => { setFarmIdState(value); write('chipu_context_farm', value) }
@@ -54,7 +55,7 @@ export function ResearchContextProvider({ children }: { children: ReactNode }) {
     const error = validateProfile(next)
     if (error) throw new Error(error)
     const updated = [...profiles.filter(p => p.id !== next.id), next]
-    localStorage.setItem('chipu_place_profiles_v1', JSON.stringify(updated.filter(p => p.kind === 'configured')))
+    if (!demonstrationMode) localStorage.setItem('chipu_place_profiles_v1', JSON.stringify(updated.filter(p => p.kind === 'configured')))
     setProfiles(updated); setProfileId(next.id); write('chipu_place_active_v2', next.id)
     setFarmId(next.id); setSiteId(next.id); setZoneId(next.zone); setScenario('S00'); setStateRun(''); setPredictionRun('')
   }
