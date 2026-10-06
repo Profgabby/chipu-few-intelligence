@@ -77,3 +77,20 @@ body{font-size:16px;background:linear-gradient(180deg,#f7faf8 0,#eef5f1 100%)}
 .domain-hero{padding:23px 26px;border-radius:9px;background:linear-gradient(110deg,#064934,#006b3c 78%,#16784b)}.domain-hero h1{font-size:34px!important}.domain-hero p{font-size:13px!important;line-height:1.55}.panel{border-radius:8px}.metric-card{border-radius:7px}
 @media(max-width:1400px){.command-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1000px){.desktop-sidebar{flex-basis:230px}.sidebar{width:230px}.workspace{padding:24px 20px}.command-grid{grid-template-columns:1fr}.system-chain{grid-template-columns:repeat(2,1fr)}}
+
+/* Dataset banner */
+.command-note[aria-label="Displayed dataset"] {
+  background: #FDB515;
+  border-color: #FDB515;
+  color: #000;
+}
+.command-note[aria-label="Displayed dataset"] strong,
+.command-note[aria-label="Displayed dataset"] p,
+.command-note[aria-label="Displayed dataset"] a,
+.command-note[aria-label="Displayed dataset"] a:visited {
+  color: #000;
+}
+.command-note[aria-label="Displayed dataset"] a:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 4px;
+}
