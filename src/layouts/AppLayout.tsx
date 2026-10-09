@@ -15,6 +15,7 @@ const groups:readonly NavGroup[]=[
     ['/app/data','Data & Context',Database],
     ['/app/location','Location & System',Database],
     ['/app/twin','Digital Twin',Activity],
+    ['/app/model-laboratory','Model Laboratory',BarChart3],
     ['/app/predict','Prediction',TrendingUp],
   ]},
   {label:'FEW intelligence',items:[

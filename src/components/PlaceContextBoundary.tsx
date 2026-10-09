@@ -4,7 +4,7 @@ import { ResearchContextProvider, useResearchContext } from '../lib/research-con
 export function PlaceContextBoundary() {
   const { profile } = useResearchContext()
   const { pathname } = useLocation()
-  const shared = ['/app/location', '/app/place', '/app/people', '/app/methods', '/app/models-methods', '/app/help'].includes(pathname)
+  const shared = ['/app/model-laboratory', '/app/location', '/app/place', '/app/people', '/app/methods', '/app/models-methods', '/app/help'].includes(pathname)
   if (profile.kind === 'demonstrator' || shared || (pathname === '/app/economics' && profile.kind === 'configured')) {
     return <Outlet key={profile.id}/>
   }

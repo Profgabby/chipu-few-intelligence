@@ -1,3 +1,4 @@
+import { AVModelLaboratoryWorkspace } from './components/AVModelLaboratoryWorkspace'
 import { LocationWorkspace } from './components/LocationWorkspace'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './layouts/AppLayout'
@@ -32,6 +33,7 @@ export default function App() {
     <Route element={<AppLayout/>}>
       <Route path="/app/location" element={<LocationWorkspace/>}/>
       <Route path="/app" element={<ChipuOverviewWorkspace/>}/>
+      <Route path="/app/model-laboratory" element={<AVModelLaboratoryWorkspace/>}/>
       <Route path="/app/twin" element={<TwinStateWorkspace/>}/>
       <Route path="/app/predict" element={<ForecastWorkspace/>}/>
       <Route path="/app/food" element={<FoodResearchWorkspace/>}/>
