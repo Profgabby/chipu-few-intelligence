@@ -29,8 +29,8 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Verify place profile boundaries
-        run: node --test tests/place-profile.test.mjs
+      - name: Verify scientific and context boundaries
+        run: node --test tests/*.test.mjs
 
       - name: Build production application
         run: npm run build
