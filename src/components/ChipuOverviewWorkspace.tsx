@@ -6,6 +6,7 @@ import { loadCommandCenterState, stateComponent, type CommandCenterState } from 
 import { useResearchContext } from '../lib/research-context'
 import { OverviewResearchContent } from './OverviewResearchContent'
 import { DecisionEvidenceGraph } from './DecisionEvidenceGraph'
+import '../overview-gardenlift.css'
 
 type Card = { id:string; title:string; kicker:string; route:string; icon:typeof Activity; status:string; action:string }
 export function ChipuOverviewWorkspace() {
@@ -42,6 +43,20 @@ export function ChipuOverviewWorkspace() {
       <div><span>{hasEvidenceContext?'DISPLAYED DATASET':'ACTIVE CONTEXT'}</span><strong>{profile.kind==='unconfigured'?'No site selected':profile.name}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
       <div><span>EVIDENCE</span><strong>{ready} of 5 analyses available</strong><small>{state?.connected?'Research persistence connected':'Local research session'}</small></div>
       <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Not built'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Build from documented observations'}</small></div>
+    </section>
+
+    <section className="overview-gardenlift" aria-labelledby="gardenlift-heading">
+      <figure className="overview-gardenlift-visual">
+        <img src="/models/SS01.webp" alt="GardenLift concept showing crops beneath elevated solar panels alongside a water tank and irrigation system" width="1600" height="900" loading="lazy"/>
+        <figcaption>SS01 GardenLift · Concept illustration</figcaption>
+      </figure>
+      <div className="overview-gardenlift-content">
+        <span className="eyebrow">LIFEWS · AGRIVOLTAIC MODEL LABORATORY</span>
+        <h2 id="gardenlift-heading">Explore Agrivoltaic Systems</h2>
+        <p>Explore 15 configurations and compare water, energy, and economic outcomes using editable engineering assumptions.</p>
+        <Link className="button button-primary" to="/app/model-laboratory">Open Model Laboratory<ArrowRight size={17} aria-hidden="true"/></Link>
+        <small>Illustrative comparisons · Not validated performance predictions</small>
+      </div>
     </section>
 
     {hasEvidenceContext&&<OverviewResearchContent zoneId={zoneId} state={state}/>}
