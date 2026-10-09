@@ -80,8 +80,8 @@ body{font-size:16px;background:linear-gradient(180deg,#f7faf8 0,#eef5f1 100%)}
 
 /* Dataset banner */
 .command-note[aria-label="Displayed dataset"] {
-  background: #FDB515;
-  border-color: #FDB515;
+  background: #D99A00;
+  border-color: #D99A00;
   color: #000;
 }
 .command-note[aria-label="Displayed dataset"] strong,

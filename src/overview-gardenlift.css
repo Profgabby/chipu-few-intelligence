@@ -1,4 +1,4 @@
-.overview-gardenlift{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:28px;margin:24px 0;padding:20px;background:#fffdf7;border:1px solid #d8e2db;border-top:3px solid #fdb515;border-radius:14px;overflow:hidden}
+.overview-gardenlift{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:28px;margin:24px 0;padding:20px;background:#fffdf7;border:1px solid #d8e2db;border-top:3px solid #d99a00;border-radius:14px;overflow:hidden}
 .overview-gardenlift-visual{margin:0;min-width:0}
 .overview-gardenlift-visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;border-radius:8px;background:#f5f3ec}
 .overview-gardenlift-visual figcaption{margin-top:8px;font-size:12px;color:#526258}
