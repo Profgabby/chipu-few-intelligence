@@ -1,0 +1,534 @@
+{
+  "schema_version": "ss01-geometry-0.1",
+  "configuration_id": "SS01-GardenLift-RC-v0.1",
+  "status": "proposed-design-not-as-built-not-construction-approved",
+  "provenance": {
+    "basis": "User-requested formalization of proposed configuration in conversation",
+    "dimensions": "Design choices, not measurements from concept illustration",
+    "module": "Unselected procurement target; no manufacturer specification claimed"
+  },
+  "coordinate_system": {
+    "units": "m",
+    "origin": "Each plot southwest corner at ground level",
+    "x": "east",
+    "y": "north",
+    "z": "up",
+    "north": "true north",
+    "ground": "level plane z=0",
+    "control_placement": "Independent local frame; geographic offset unresolved; drawing panels do not imply adjacency"
+  },
+  "site": {
+    "latitude_deg": null,
+    "longitude_deg": null,
+    "elevation_m": null,
+    "timezone": null,
+    "weather_dataset": null
+  },
+  "design_inputs": {
+    "plot_east_west_m": 12,
+    "plot_north_south_m": 12,
+    "row_count": 2,
+    "modules_per_row": 6,
+    "module_slope_length_m": 1.722,
+    "module_east_west_width_m": 1.134,
+    "module_gap_along_row_m": 0.02,
+    "module_rating_target_Wp": 430,
+    "surface_tilt_deg": 20,
+    "surface_azimuth_deg_clockwise_from_north": 180,
+    "row_pitch_m": 6,
+    "lower_module_edge_height_m": 2.4,
+    "tracking": false,
+    "battery": false,
+    "module_dimensions_status": "provisional-envelope-replace-with-selected-datasheet"
+  },
+  "derived": {
+    "module_count": 12,
+    "dc_capacity_target_kWp": 5.16,
+    "plot_area_m2": 144,
+    "planted_area_per_plot_m2": 48,
+    "row_length_including_gaps_m": 6.903999999999999,
+    "module_horizontal_projection_m": 1.6181506929933342,
+    "module_vertical_rise_m": 0.5889586868068015,
+    "upper_module_edge_height_m": 2.9889586868068014,
+    "row_center_height_m": 2.6944793434034007,
+    "clear_horizontal_gap_between_rows_m": 4.381849307006666,
+    "module_surface_area_total_m2": 23.432976,
+    "module_projected_area_total_m2": 22.019794630253294
+  },
+  "av_plot": {
+    "rows": [
+      {
+        "id": "R1",
+        "horizontal_centerline_y_m": 3.0,
+        "modules": [
+          {
+            "id": "R1M1",
+            "corners_m": [
+              [
+                2.5480000000000005,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                3.6820000000000004,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                3.6820000000000004,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                2.5480000000000005,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R1M2",
+            "corners_m": [
+              [
+                3.7020000000000004,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                4.836,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                4.836,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                3.7020000000000004,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R1M3",
+            "corners_m": [
+              [
+                4.856,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                5.99,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                5.99,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                4.856,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R1M4",
+            "corners_m": [
+              [
+                6.01,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                7.144,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                7.144,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                6.01,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R1M5",
+            "corners_m": [
+              [
+                7.164,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                8.298,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                8.298,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                7.164,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R1M6",
+            "corners_m": [
+              [
+                8.318,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                9.452,
+                2.190924653503333,
+                2.4
+              ],
+              [
+                9.452,
+                3.809075346496667,
+                2.9889586868068014
+              ],
+              [
+                8.318,
+                3.809075346496667,
+                2.9889586868068014
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "id": "R2",
+        "horizontal_centerline_y_m": 9.0,
+        "modules": [
+          {
+            "id": "R2M1",
+            "corners_m": [
+              [
+                2.5480000000000005,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                3.6820000000000004,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                3.6820000000000004,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                2.5480000000000005,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R2M2",
+            "corners_m": [
+              [
+                3.7020000000000004,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                4.836,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                4.836,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                3.7020000000000004,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R2M3",
+            "corners_m": [
+              [
+                4.856,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                5.99,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                5.99,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                4.856,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R2M4",
+            "corners_m": [
+              [
+                6.01,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                7.144,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                7.144,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                6.01,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R2M5",
+            "corners_m": [
+              [
+                7.164,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                8.298,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                8.298,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                7.164,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          },
+          {
+            "id": "R2M6",
+            "corners_m": [
+              [
+                8.318,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                9.452,
+                8.190924653503332,
+                2.4
+              ],
+              [
+                9.452,
+                9.809075346496668,
+                2.9889586868068014
+              ],
+              [
+                8.318,
+                9.809075346496668,
+                2.9889586868068014
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "beds": [
+      {
+        "id": "B1",
+        "southwest_m": [
+          2.0,
+          0.75,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B2",
+        "southwest_m": [
+          2.0,
+          2.65,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B3",
+        "southwest_m": [
+          2.0,
+          4.55,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B4",
+        "southwest_m": [
+          2.0,
+          6.45,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B5",
+        "southwest_m": [
+          2.0,
+          8.35,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B6",
+        "southwest_m": [
+          2.0,
+          10.25,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      }
+    ]
+  },
+  "open_sun_plot": {
+    "width_m": 12,
+    "length_m": 12,
+    "pv_modules": [],
+    "beds": [
+      {
+        "id": "B1",
+        "southwest_m": [
+          2.0,
+          0.75,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B2",
+        "southwest_m": [
+          2.0,
+          2.65,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B3",
+        "southwest_m": [
+          2.0,
+          4.55,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B4",
+        "southwest_m": [
+          2.0,
+          6.45,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B5",
+        "southwest_m": [
+          2.0,
+          8.35,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      },
+      {
+        "id": "B6",
+        "southwest_m": [
+          2.0,
+          10.25,
+          0.0
+        ],
+        "east_west_length_m": 8.0,
+        "north_south_width_m": 1.0
+      }
+    ],
+    "shade_exclusion_verified": false
+  },
+  "crop": {
+    "species": "lettuce",
+    "cultivar": null,
+    "planting_date": null,
+    "harvest_date": null
+  },
+  "irrigation": {
+    "method": "drip",
+    "control": "Same soil-moisture rule in both treatments; independent delivered-volume measurement",
+    "trigger": null,
+    "pump_curve": null,
+    "total_dynamic_head_m": null,
+    "efficiency": null,
+    "emitter_specification": null
+  },
+  "unresolved": [
+    "Geographic placement and all-season control shading exclusion",
+    "Module and inverter datasheets and string design",
+    "Posts, beams, foundations, loads and minimum unobstructed clearance",
+    "Soil, crop, weather and irrigation parameters",
+    "Equipment and installation costs",
+    "Replication/randomization; beds within one array are subsamples, not independent AV replicates"
+  ],
+  "simulation_results": null,
+  "formulas": {
+    "row_length": "6 * module_width + 5 * gap",
+    "horizontal_projection": "module_slope_length * cos(tilt)",
+    "upper_edge": "lower_edge + module_slope_length * sin(tilt)",
+    "dc_capacity": "module_count * rating_Wp / 1000"
+  }
+}
