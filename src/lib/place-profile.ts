@@ -6,7 +6,7 @@ export type PlaceProfile = {
   weather: string; soil: string; irrigation: string; pv: string; tariff: string;
   calibration: string; units: 'SI'; kind: 'demonstrator' | 'configured' | 'unconfigured';
 }
-export const demonstration: PlaceProfile = { id: 'CEDAR-CREEK', name: 'Cedar Creek demonstrator', country: '', region: '', district: '', latitude: '', longitude: '', elevation: '', timezone: 'UTC', currency: 'USD', systemType: 'Agrivoltaics', zone: 'AV-A', experiment: '', crop: '', weather: '', soil: '', irrigation: '', pv: '', tariff: '', calibration: '', units: 'SI', kind: 'demonstrator' }
+export const demonstration: PlaceProfile = { id: 'CEDAR-CREEK', name: 'CHIPU-FEW simulation example', country: '', region: '', district: '', latitude: '', longitude: '', elevation: '', timezone: 'UTC', currency: 'USD', systemType: 'Agrivoltaics', zone: 'AV-A', experiment: '', crop: '', weather: '', soil: '', irrigation: '', pv: '', tariff: '', calibration: '', units: 'SI', kind: 'demonstrator' }
 export function blankProfile(country = 'US'): PlaceProfile {
   return { ...demonstration, id: crypto.randomUUID(), name: '', country, region: country === 'US' ? 'Oregon' : '', district: '', timezone: country === 'US' ? 'America/Los_Angeles' : country === 'NG' ? 'Africa/Lagos' : 'UTC', currency: country === 'NG' ? 'NGN' : country === 'US' ? 'USD' : '', zone: '', kind: 'configured' }
 }

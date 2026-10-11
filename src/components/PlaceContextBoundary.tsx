@@ -10,7 +10,7 @@ export function PlaceContextBoundary() {
   }
   return <>
     <section className="command-note" aria-label="Displayed dataset">
-      <div><strong>Demonstration dataset</strong><p>{profile.kind === 'configured' ? `${profile.name} has no connected analysis dataset. Displaying the Cedar Creek demonstration, not results for this location.` : 'Exploring the Cedar Creek demonstration dataset.'}</p></div>
+      <div><strong>Simulation example</strong><p>{profile.kind === 'configured' ? `${profile.name} is selected. The workspace below uses example data; connect your dataset for site-specific analysis.` : 'Explore the research tools using a synthetic example dataset, or choose a location and add your own data.'}</p></div>
       <Link className="button" to="/app/location">Choose location &amp; system</Link>
     </section>
     <ResearchContextProvider key={`demonstration-${profile.id}`} demonstrationMode><Outlet/></ResearchContextProvider>

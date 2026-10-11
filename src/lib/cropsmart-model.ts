@@ -12,7 +12,7 @@ export type Scenario = { id: string; name: string; water: number; energy: number
 export type ScenarioResult = { irrigation: number; waterDeficit: number; tank: number; pumpEnergy: number; pvEnergy: number; soc: number; cropRisk: number; foodRisk: number; reliability: number }
 
 export const farmState = {
-  name: 'Cedar Creek Research Farm', model: 'WE-0.3.1', dataset: 'SYNTH-7D-HOURLY-01',
+  name: 'CHIPU-FEW Simulation Example', model: 'WE-0.3.1', dataset: 'SYNTH-7D-HOURLY-01',
   stateRun: 'STATE-0047', predictionRun: 'PRED-0048', experiment: 'EXP-014', scenario: 'S00',
   resources: { water: 2840, tank: 68, pvPower: 50.5, pvEnergy: 271, pumpPower: 38.2, pumpEnergy: 40.1, soc: 74, cooling: 18.6, reserve: 33 },
   zones: [
