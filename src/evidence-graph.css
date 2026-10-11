@@ -11,7 +11,7 @@
 .evidence-details summary{padding:20px 26px;cursor:pointer;font-weight:700;color:#183e31}
 .evidence-details-help{margin:0;padding:0 26px 20px;color:#596d64;line-height:1.5}
 .evidence-details .evidence-graph-shell{grid-template-columns:minmax(0,1fr) minmax(260px,340px);overflow:visible}
-.evidence-details .evidence-canvas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-content:start;min-width:0;min-height:0;padding:24px;background:#f7faf8;overflow:visible}
+.evidence-details .evidence-canvas{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-content:start;min-width:0;min-height:0;padding:24px;background:#f7faf8;overflow:visible}
 .evidence-details .evidence-node{position:static;transform:none;width:100%;min-width:0;min-height:76px;box-shadow:none;grid-template-columns:auto 1fr;opacity:1}
 .evidence-details .evidence-node:hover,.evidence-details .evidence-node-selected{transform:none;border-color:#006B3C;background:#edf6f0}
 .evidence-details .evidence-node>.research-status{grid-column:2}
