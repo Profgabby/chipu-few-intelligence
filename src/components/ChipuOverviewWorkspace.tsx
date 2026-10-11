@@ -21,11 +21,11 @@ export function ChipuOverviewWorkspace() {
   const pv=stateComponent(state?.twin,'pv_power')
   const cards=useMemo<Card[]>(()=>[
     {id:'food',title:'Food',kicker:'CROP SYSTEM',route:'/app/food',icon:Sprout,status:hasEvidenceContext?`${zone.crop} · ${zone.stage}`:'Crop & growing conditions',action:'Open Food'},
-    {id:'water',title:'Water',kicker:'SOIL + IRRIGATION',route:'/app/water',icon:Droplets,status:soil?.value!==null&&soil?.value!==undefined?`${soil.value} ${soil.unit}`:'Awaiting Twin state',action:'Open Water'},
-    {id:'energy',title:'Energy',kicker:'PV + STORAGE + LOADS',route:'/app/energy',icon:Sun,status:pv?.value!==null&&pv?.value!==undefined?`${pv.value} ${pv.unit}`:'Awaiting Twin state',action:'Open Energy'},
-    {id:'twin',title:'Digital Twin',kicker:'SYSTEM STATE',route:'/app/twin',icon:Activity,status:state?.twin?`${state.twin.completeness}% complete`:'No state yet',action:state?.twin?'Inspect state':'Build Twin'},
-    {id:'predict',title:'Prediction',kicker:'FORECAST + UNCERTAINTY',route:'/app/predict',icon:BrainCircuit,status:state?.forecast?`${state.forecast.horizonHours} h horizon`:'No forecast yet',action:state?.forecast?'Inspect forecast':'Run model'},
-    {id:'control',title:'Scenarios & Control',kicker:'ALLOCATION + DECISION',route:'/app/control',icon:Gauge,status:state?.scenarioRun?'Decision run available':'No run yet',action:state?.scenarioRun?'Inspect run':'Run scenario'},
+    {id:'water',title:'Water',kicker:'SOIL + IRRIGATION',route:'/app/water',icon:Droplets,status:soil?.value!==null&&soil?.value!==undefined?`${soil.value} ${soil.unit}`:'Soil moisture and irrigation analysis',action:'Open Water'},
+    {id:'energy',title:'Energy',kicker:'PV + STORAGE + LOADS',route:'/app/energy',icon:Sun,status:pv?.value!==null&&pv?.value!==undefined?`${pv.value} ${pv.unit}`:'Solar generation, storage and demand',action:'Open Energy'},
+    {id:'twin',title:'Digital Twin',kicker:'SYSTEM STATE',route:'/app/twin',icon:Activity,status:state?.twin?`${state.twin.completeness}% complete`:'Observation-based system modeling',action:state?.twin?'Inspect state':'Open Digital Twin'},
+    {id:'predict',title:'Prediction',kicker:'FORECAST + UNCERTAINTY',route:'/app/predict',icon:BrainCircuit,status:state?.forecast?`${state.forecast.horizonHours} h horizon`:'Explore forecasts and uncertainty',action:state?.forecast?'Inspect forecast':'Run model'},
+    {id:'control',title:'Scenarios & Control',kicker:'ALLOCATION + DECISION',route:'/app/control',icon:Gauge,status:state?.scenarioRun?'Decision run available':'Compare operating strategies',action:state?.scenarioRun?'Inspect run':'Run scenario'},
   ],[state,zone,soil,pv,hasEvidenceContext])
   const ready=[state?.twin,state?.forecast,state?.scenarioRun,state?.latestEconomic,state?.latestResilience].filter(Boolean).length
   return <div className="workspace command-center research-instrument">
@@ -33,16 +33,16 @@ export function ChipuOverviewWorkspace() {
       <div>
         <div className="eyebrow">CHIPU-FEW INTELLIGENCE</div>
         <h1>System overview</h1>
-        <p>Integrated food–energy–water research workspace for state estimation, prediction and decision analysis.</p>
+        <p>Explore how crops, water and solar energy interact. Run scenarios, examine system conditions and compare decisions in one research workspace.</p>
       </div>
       <Link className="button button-primary" to="/app/location">{profile.kind==='unconfigured'?'Choose location & system':'Manage location & system'}</Link>
       {hasEvidenceContext&&<button className="console-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh'}</button>}
     </header>
 
     <section className="overview-summary" aria-label="Active research context">
-      <div><span>{hasEvidenceContext?'DISPLAYED DATASET':'ACTIVE CONTEXT'}</span><strong>{profile.kind==='unconfigured'?'No site selected':profile.name}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
+      <div><span>{hasEvidenceContext?'DISPLAYED DATASET':'ACTIVE CONTEXT'}</span><strong>{profile.kind==='unconfigured'?'Choose your study location':(hasEvidenceContext?'CHIPU-FEW simulation example':profile.name)}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
       <div><span>EVIDENCE</span><strong>{ready} of 5 analyses available</strong><small>{state?.connected?'Research persistence connected':'Local research session'}</small></div>
-      <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Not built'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Build from documented observations'}</small></div>
+      <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Explore system state'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Organize observations into a digital system model'}</small></div>
     </section>
 
     <section className="overview-gardenlift" aria-labelledby="gardenlift-heading">
@@ -53,9 +53,9 @@ export function ChipuOverviewWorkspace() {
       <div className="overview-gardenlift-content">
         <span className="eyebrow">LIFEWS · AGRIVOLTAIC MODEL LABORATORY</span>
         <h2 id="gardenlift-heading">Explore Agrivoltaic Systems</h2>
-        <p>Explore 15 configurations and compare water, energy, and economic outcomes using editable engineering assumptions.</p>
+        <p>Run the SS01 GardenLift simulation, adjust system parameters or upload daily data, and explore six connected areas of analysis.</p>
         <Link className="button button-primary" to="/app/model-laboratory">Open Model Laboratory<ArrowRight size={17} aria-hidden="true"/></Link>
-        <small>Illustrative comparisons · Not validated performance predictions</small>
+        <small>Scenario-based research · Assumptions and calculation methods included</small>
       </div>
     </section>
 
