@@ -15,7 +15,7 @@ const moduleContent: Partial<Record<ChipuModuleId,{intro:string;emptyTitle:strin
     intro: 'Site-specific geographic, land, soil, infrastructure and operational context for FEW decisions.',
     emptyTitle: 'Dedicated place dataset not yet configured',
     emptyText: 'Existing farm and zone context is reused here. Soil, land, infrastructure, regulatory and hazard attributes will be persisted only after project/site scoping and RLS are designed explicitly.',
-    links: [{label:'Farm Digital Twin',to:'/app/farm'},{label:'Agrivoltaic Comparison',to:'/app/agrivoltaics'}],
+    links: [{label:'Farm Digital Twin',to:'/app/farm'},{label:'Agrivoltaics Comparison',to:'/app/agrivoltaics'}],
   },
   economics: {
     intro: 'Techno-economic analysis for costs, revenues, affordability, payback and investment decisions.',

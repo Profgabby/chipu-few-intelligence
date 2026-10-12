@@ -17,8 +17,8 @@ export const farmState = {
   resources: { water: 2840, tank: 68, pvPower: 50.5, pvEnergy: 271, pumpPower: 38.2, pumpEnergy: 40.1, soc: 74, cooling: 18.6, reserve: 33 },
   zones: [
     { id: 'OPEN-A', name: 'Open-field reference', type: 'OPEN-FIELD REFERENCE', crop: 'Tomato', variety: 'Roma VF', stage: 'Fruit development', dap: 58, shade: 0, soilWater: .294, threshold: .24, demand: 5.6, irrigation: 4.1, deficitHours: 42, stress: .18, harvest: 72, marketable: 410, radiation: 6.4, pvPower: 0, pvEnergy: 0, pumpEnergy: 10.8 },
-    { id: 'AV-A', name: 'Agrivoltaic configuration A', type: 'AGRIVOLTAIC TREATMENT', crop: 'Tomato', variety: 'Roma VF', stage: 'Fruit development', dap: 58, shade: .32, soilWater: .287, threshold: .24, demand: 5.1, irrigation: 3.5, deficitHours: 18, stress: .21, harvest: 69, marketable: 386, radiation: 4.5, pvPower: 27.4, pvEnergy: 142, pumpEnergy: 9.2 },
-    { id: 'AV-B', name: 'Agrivoltaic configuration B', type: 'AGRIVOLTAIC TREATMENT', crop: 'Pepper', variety: 'Carmen', stage: 'Flowering', dap: 46, shade: .18, soilWater: .301, threshold: .25, demand: 5.8, irrigation: 4.8, deficitHours: 31, stress: .16, harvest: 54, marketable: 332, radiation: 5.3, pvPower: 23.1, pvEnergy: 129, pumpEnergy: 12.7 },
+    { id: 'AV-A', name: 'Agrivoltaics configuration A', type: 'AGRIVOLTAICS TREATMENT', crop: 'Tomato', variety: 'Roma VF', stage: 'Fruit development', dap: 58, shade: .32, soilWater: .287, threshold: .24, demand: 5.1, irrigation: 3.5, deficitHours: 18, stress: .21, harvest: 69, marketable: 386, radiation: 4.5, pvPower: 27.4, pvEnergy: 142, pumpEnergy: 9.2 },
+    { id: 'AV-B', name: 'Agrivoltaics configuration B', type: 'AGRIVOLTAICS TREATMENT', crop: 'Pepper', variety: 'Carmen', stage: 'Flowering', dap: 46, shade: .18, soilWater: .301, threshold: .25, demand: 5.8, irrigation: 4.8, deficitHours: 31, stress: .16, harvest: 54, marketable: 332, radiation: 5.3, pvPower: 23.1, pvEnergy: 129, pumpEnergy: 12.7 },
     { id: 'EXPERIMENTAL-A', name: 'Alternative experimental treatment', type: 'EXPERIMENTAL TREATMENT', crop: 'Lettuce', variety: 'Green Butter', stage: 'Vegetative', dap: 31, shade: .08, soilWater: .276, threshold: .22, demand: 3.7, irrigation: 3.1, deficitHours: 26, stress: .24, harvest: 81, marketable: 198, radiation: 5.9, pvPower: 0, pvEnergy: 0, pumpEnergy: 7.4 },
   ] as Zone[],
 }
@@ -31,7 +31,7 @@ export const getZone = (id: string) => farmState.zones.find(zone => zone.id === 
 export const getScenario = (id: string) => scenarios.find(item => item.id === id) ?? scenarios[0]
 
 export function calculateScenario(zone: Zone, id: string, shade = zone.shade): ScenarioResult {
-  const item = getScenario(id); const shadeEffect = zone.type === 'AGRIVOLTAIC TREATMENT' ? 1 - (shade - zone.shade) * .35 : 1
+  const item = getScenario(id); const shadeEffect = zone.type === 'AGRIVOLTAICS TREATMENT' ? 1 - (shade - zone.shade) * .35 : 1
   const irrigation = Math.max(0, zone.irrigation * item.water * shadeEffect)
   const pumpEnergy = zone.pumpEnergy * item.energy * (.78 / item.pump)
   const pvEnergy = (zone.pvEnergy || farmState.resources.pvEnergy) * item.pv
