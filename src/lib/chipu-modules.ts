@@ -9,7 +9,7 @@ export const CHIPU_MODULES:readonly ChipuModule[]=[
 {id:'people',name:'CHIPU-FEW People',shortName:'People',description:'Stakeholders, adoption, behavior and decision context',route:'/app/people',status:'implemented'},
 {id:'place',name:'CHIPU-FEW Place',shortName:'Place',description:'Location, land, infrastructure and contextual conditions',route:'/app/place',status:'implemented',legacyRoutes:['/app/farm','/app/agrivoltaics','/app/comparison']},
 {id:'control',name:'CHIPU-FEW Control',shortName:'Control',description:'Optimization, scheduling and operational control',route:'/app/control',status:'implemented',legacyRoutes:['/app/resource-allocation','/app/resources']},
-{id:'economics',name:'CHIPU-FEW Economics',shortName:'Economics',description:'Transparent costs, benefits, payback and investment analysis',route:'/app/economics',status:'implemented'},
+{id:'economics',name:'CHIPU-FEW Techno-economics',shortName:'Techno-economics',description:'Transparent costs, benefits, payback and investment analysis',route:'/app/economics',status:'implemented'},
 {id:'resilience',name:'CHIPU-FEW Resilience',shortName:'Resilience',description:'Scenario-derived continuity, vulnerability and adaptation analysis',route:'/app/resilience',status:'implemented',legacyRoutes:['/app/scenarios','/app/scenario-laboratory']},
 ] as const
 export const CHIPU_PRODUCT={name:'CHIPU-FEW Intelligence',shortName:'CHIPU-FEW',descriptor:'Integrated Predictive Decision Systems for Food–Energy–Water Management'} as const

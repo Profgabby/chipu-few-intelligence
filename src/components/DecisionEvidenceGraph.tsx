@@ -42,7 +42,7 @@ export function DecisionEvidenceGraph({state,zone,scenarioId,onEvidenceChanged}:
   const workflowFor=(item:EvidenceEdge)=>{
     if(item.from==='twin'&&item.to==='predict') return {label:'Run Forecast',detail:state?.twin?'Create a forecast from the currently selected persisted Twin state.':'A Twin state is required first.',enabled:Boolean(state?.twin)}
     if(item.from==='predict'&&item.to==='control') return {label:'Run Receding-Horizon Control',detail:state?.forecast?`Use a moving 24-hour lookahead across the ${state.forecast.horizonHours}-hour forecast. At each ${state.forecast.stepHours}-hour decision step, evaluate strategies, apply only the current action, update modeled soil-water, tank and battery states, then optimize again.`:'A forecast is required first.',enabled:Boolean(state?.forecast)}
-    if(item.from==='control'&&item.to==='economics') return {label:'Open pre-filled Economics',detail:state?.scenarioRun?'Carry the selected Control run into Economics as documented operational context. Monetary inputs remain researcher-entered.':'A Control run is required first.',enabled:Boolean(state?.scenarioRun)}
+    if(item.from==='control'&&item.to==='economics') return {label:'Open Techno-economics',detail:state?.scenarioRun?'Carry the selected Control run into Techno-economics as documented operational context. Monetary inputs remain researcher-entered.':'A Control run is required first.',enabled:Boolean(state?.scenarioRun)}
     if(item.from==='control'&&item.to==='resilience') return {label:'Open pre-filled Resilience',detail:state?.scenarioRun?'Carry the selected Control run directly into the existing resilience assessment engine.':'A Control run is required first.',enabled:Boolean(state?.scenarioRun)}
     const target=graph.nodes.find(node=>node.id===item.to)
     return {label:target?.nextAction??'Open module',detail:`Complete the ${target?.label??item.to} evidence required by this dependency.`,enabled:Boolean(target?.route),route:target?.route}
@@ -63,7 +63,7 @@ export function DecisionEvidenceGraph({state,zone,scenarioId,onEvidenceChanged}:
         await onEvidenceChanged();return
       }
       if(item.from==='control'&&item.to==='economics'){
-        if(!state?.scenarioRun)throw new Error('Run Control before opening Economics.')
+        if(!state?.scenarioRun)throw new Error('Run Control before opening Techno-economics.')
         navigate('/app/economics',{state:{controlRun:state.scenarioRun,source:'decision-evidence-graph'}});return
       }
       if(item.from==='control'&&item.to==='resilience'){
