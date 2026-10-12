@@ -23,7 +23,7 @@ const groups:readonly NavGroup[]=[
     ['/app/water','Water',Droplets],
     ['/app/energy','Energy',Zap],
     ['/app/control','Scenarios & Control',Gauge],
-    ['/app/economics','Economics',BarChart3],
+    ['/app/economics','Techno-economics',BarChart3],
     ['/app/resilience','Resilience',ShieldCheck],
   ]},
   {label:'Research',items:[
