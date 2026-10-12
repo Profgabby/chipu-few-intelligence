@@ -51,8 +51,8 @@ export function ChipuOverviewWorkspace() {
         <figcaption>SS01 GardenLift · Concept illustration</figcaption>
       </figure>
       <div className="overview-gardenlift-content">
-        <span className="eyebrow">LIFEWS · AGRIVOLTAIC MODEL LABORATORY</span>
-        <h2 id="gardenlift-heading">Explore Agrivoltaic Systems</h2>
+        <span className="eyebrow">LIFEWS · AGRIVOLTAICS MODEL LABORATORY</span>
+        <h2 id="gardenlift-heading">Explore Agrivoltaics Systems</h2>
         <p>Run the SS01 GardenLift simulation, adjust system parameters or upload daily data, and explore six connected areas of analysis.</p>
         <Link className="button button-primary" to="/app/model-laboratory">Open Model Laboratory<ArrowRight size={17} aria-hidden="true"/></Link>
         <small>Scenario-based research · Assumptions and calculation methods included</small>
