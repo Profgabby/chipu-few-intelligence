@@ -78,22 +78,26 @@ body{font-size:16px;background:linear-gradient(180deg,#f7faf8 0,#eef5f1 100%)}
 @media(max-width:1400px){.command-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1000px){.desktop-sidebar{flex-basis:230px}.sidebar{width:230px}.workspace{padding:24px 20px}.command-grid{grid-template-columns:1fr}.system-chain{grid-template-columns:repeat(2,1fr)}}
 
-/* Dataset banner */
+/* Shared dataset context: gold is an accent, not a full-width alert. */
 .command-note[aria-label="Displayed dataset"] {
-  background: #D99A00;
-  border-color: #D99A00;
-  color: #000;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin:16px 30px 0;padding:14px 18px;
+  background:#fffdf7;border:1px solid #e7e2d3;border-left:3px solid #b88719;
+  border-radius:8px;color:#193e32;box-shadow:none;
 }
-.command-note[aria-label="Displayed dataset"] strong,
-.command-note[aria-label="Displayed dataset"] p,
+.command-note[aria-label="Displayed dataset"]>div{min-width:0}
+.command-note[aria-label="Displayed dataset"] strong{color:#193e32;font-size:14px;line-height:1.4}
+.command-note[aria-label="Displayed dataset"] p{color:#526158;font-size:13px;line-height:1.5;margin:4px 0 0;max-width:85ch}
 .command-note[aria-label="Displayed dataset"] a,
-.command-note[aria-label="Displayed dataset"] a:visited {
-  color: #000;
+.command-note[aria-label="Displayed dataset"] a:visited{
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  min-height:40px;padding:8px 12px;background:#fff;border:1px solid #b9cdc1;
+  border-radius:6px;color:#006b3c;font-size:13px;font-weight:600;text-decoration:none;
 }
-.command-note[aria-label="Displayed dataset"] a:focus-visible {
-  outline: 2px solid #000;
-  outline-offset: 4px;
-}
+.command-note[aria-label="Displayed dataset"] a:hover{background:#edf5ef;border-color:#006b3c}
+.command-note[aria-label="Displayed dataset"] a:focus-visible{outline:3px solid #006b3c;outline-offset:3px}
+@media(max-width:1000px){.command-note[aria-label="Displayed dataset"]{margin:12px 20px 0;flex-wrap:wrap}}
+@media(max-width:540px){.command-note[aria-label="Displayed dataset"]{margin:12px 12px 0;padding:12px 14px;gap:12px}.command-note[aria-label="Displayed dataset"] a{width:100%;box-sizing:border-box}}
 
 /* Compact research overview */
 .research-context-bar>a,.research-context-bar>a:visited{color:#006B3C;font-weight:600}
