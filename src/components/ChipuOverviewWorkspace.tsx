@@ -33,16 +33,15 @@ export function ChipuOverviewWorkspace() {
       <div>
         <div className="eyebrow">CHIPU-FEW INTELLIGENCE</div>
         <h1>System overview</h1>
-        <p>Explore how crops, water and solar energy interact. Run scenarios, examine system conditions and compare decisions in one research workspace.</p>
+        <p>Review your analysis context, run a comparison, or continue a saved analysis.</p>
       </div>
-      <Link className="button button-primary" to="/app/location">{profile.kind==='unconfigured'?'Choose location & system':'Manage location & system'}</Link>
       {hasEvidenceContext&&<button className="console-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh'}</button>}
     </header>
 
     <section className="overview-summary" aria-label="Active research context">
-      <div><span>{hasEvidenceContext?'DISPLAYED DATASET':'ACTIVE CONTEXT'}</span><strong>{profile.kind==='unconfigured'?'Choose your study location':(hasEvidenceContext?'CHIPU-FEW simulation example':profile.name)}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
-      <div><span>EVIDENCE</span><strong>{ready} of 5 analyses available</strong><small>{state?.connected?'Research persistence connected':'Local research session'}</small></div>
-      <div><span>DIGITAL TWIN</span><strong>{state?.twin?state.twin.aggregateQuality:'Explore system state'}</strong><small>{state?.twin?`${state.twin.completeness}% state completeness`:'Organize observations into a digital system model'}</small></div>
+      <div><span>ANALYSIS CONTEXT</span><strong>{hasEvidenceContext?'Simulation example':profile.name}</strong><small>{hasEvidenceContext?'Synthetic example data · not site measurements':'Review site inputs using the location control above'}</small></div>
+      <div><span>INPUTS</span><strong>{hasEvidenceContext?'Assumed parameters':'Site configuration'}</strong><small>Review weather, soil, crop and system values before running.</small></div>
+      <div><span>RESULT HISTORY</span><strong>{busy?'Loading saved analyses…':ready?`${ready} analysis types with saved records`:'No saved analyses loaded'}</strong><small>Standalone calculator runs are not automatically added here.</small></div>
     </section>
 
     <section className="overview-gardenlift" aria-labelledby="gardenlift-heading">
@@ -51,15 +50,26 @@ export function ChipuOverviewWorkspace() {
         <figcaption>SS01 GardenLift · Concept illustration</figcaption>
       </figure>
       <div className="overview-gardenlift-content">
-        <span className="eyebrow">LIFEWS · AGRIVOLTAIC MODEL LABORATORY</span>
-        <h2 id="gardenlift-heading">Explore Agrivoltaic Systems</h2>
-        <p>Run the SS01 GardenLift simulation, adjust system parameters or upload daily data, and explore six connected areas of analysis.</p>
-        <Link className="button button-primary" to="/app/model-laboratory">Open Model Laboratory<ArrowRight size={17} aria-hidden="true"/></Link>
-        <small>Scenario-based research · Assumptions and calculation methods included</small>
+        <span className="eyebrow">LIFEWS · START A COMPARISON</span>
+        <h2 id="gardenlift-heading">SS01 GardenLift versus open sun</h2>
+        <p>Starting configuration: 12 modules · 5.16 kWp · 48 m² crop area. Review the assumed design and annual inputs, then compare water, energy, crop and financial outcomes.</p>
+        <Link className="button button-primary" to="/app/model-laboratory">Run SS01 versus open sun<ArrowRight size={17} aria-hidden="true"/></Link>
+        <small>Opens the SS01 setup for review before running. This starting case is independent of the site selected above.</small>
       </div>
     </section>
 
-    {hasEvidenceContext&&<OverviewResearchContent zoneId={zoneId} state={state}/>}
+    <section className="overview-saved-results research-surface" aria-label="Available analysis records"><header><h2>Saved analysis records</h2><span>{state?.connected?'Connected research session':'Local research session'}</span></header>
+      <p>{ready?'Continue an available analysis below.':'Start with the SS01 comparison above, or open a workspace below. This overview checks saved system-state, forecast, control, economic and resilience records; it does not collect unsaved calculator outputs.'}</p>
+      <div className="overview-record-links">{[
+        {name:'System state',available:!!state?.twin,route:'/app/twin'},
+        {name:'Forecast',available:!!state?.forecast,route:'/app/predict'},
+        {name:'Control scenario',available:!!state?.scenarioRun,route:'/app/control'},
+        {name:'Techno-economics',available:!!state?.latestEconomic,route:'/app/economics'},
+        {name:'Resilience',available:!!state?.latestResilience,route:'/app/resilience'},
+      ].filter(item=>item.available).map(item=><Link key={item.name} to={item.route}>Review {item.name}<ArrowRight size={15}/></Link>)}</div>
+      {state?.errors.length? <p>Some records could not be loaded. Use Refresh to retry.</p>:null}
+    </section>
+    {hasEvidenceContext&&<details className="overview-context-details"><summary>View dataset details and research context</summary><OverviewResearchContent zoneId={zoneId} state={state}/></details>}
 
     <section className="console-section-heading module-heading"><div><span>CORE WORKSPACES</span><h2>Research system</h2></div></section>
     <section className="command-grid command-grid-core">{cards.map(({icon:Icon,...card})=><Link to={card.route} className={`command-card command-card-${card.id}`} key={card.id}>
@@ -70,7 +80,7 @@ export function ChipuOverviewWorkspace() {
 
     <section className="overview-analysis">
       <div className="console-section-heading"><div><span>PROVENANCE</span><h2>Decision evidence</h2></div></div>
-      {hasEvidenceContext?<DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>:<div className="panel"><div className="panel-body"><h3>Site evidence</h3><p>{profile.kind==='unconfigured'?'Select a site to inspect its observations and analysis readiness.':'Connect local observations and model parameters to prepare site analyses.'}</p>{[['Weather',profile.weather],['Soil',profile.soil],['Crop',profile.crop],['Water / irrigation',profile.irrigation],['PV / storage',profile.pv]].map(([label,reference])=><div className="list-row" key={label}><strong>{label}</strong><span>{reference||'Not connected'}</span></div>)}<Link className="button" to="/app/location">Review location & system<ArrowRight size={16}/></Link></div></div>}
+      {hasEvidenceContext?<DecisionEvidenceGraph state={state} zone={zone} scenarioId={scenario} onEvidenceChanged={refresh}/>:<div className="panel"><div className="panel-body"><h3>Site evidence</h3><p>{profile.kind==='unconfigured'?'Select a site to inspect its observations and analysis readiness.':'Connect local observations and model parameters to prepare site analyses.'}</p>{[['Weather',profile.weather],['Soil',profile.soil],['Crop',profile.crop],['Water / irrigation',profile.irrigation],['PV / storage',profile.pv]].map(([label,reference])=><div className="list-row" key={label}><strong>{label}</strong><span>{reference||'Not connected'}</span></div>)}<p>Use the location control at the top of the page to review these inputs.</p></div></div>}
     </section>
 
     {state?.errors.length ? (
