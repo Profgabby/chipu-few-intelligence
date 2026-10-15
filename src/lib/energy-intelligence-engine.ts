@@ -1,3 +1,4 @@
+import { measuredPumpEnergyKwh } from './predata-scientific-baselines'
 import { getTwinState, listTwinStates, type TwinStateEstimate } from './state-engine'
 import { listForecasts, type ForecastRun } from './forecast-engine'
 import { runWaterAnalysis, type WaterAnalysisResult } from './water-intelligence-engine'
@@ -68,6 +69,13 @@ export async function runEnergyAnalysis(options: {
   const water: WaterAnalysisResult = await runWaterAnalysis({stateId:state.id, forecastId:forecast?.id})
 
   const horizonHours = options.horizonHours ?? 24
+  const boundedPct = (x:number) => Number.isFinite(x) && x >= 0 && x <= 100
+  const finiteNonnegative = (x:number) => Number.isFinite(x) && x >= 0
+  if (!Number.isFinite(horizonHours) || horizonHours <= 0 || horizonHours > 168
+      || !finiteNonnegative(options.batteryCapacityKwh ?? 60)
+      || !boundedPct(options.reserveFloorPct ?? 20)
+      || ![options.coolingDemandKwh ?? 18, options.processingDemandKwh ?? 8, options.otherCriticalDemandKwh ?? 6].every(finiteNonnegative))
+    throw new Error('Invalid energy analysis settings.')
   const pvPowerKw = value(state,'pv_power')
   const batterySocPct = value(state,'battery_soc')
   const batteryCapacityKwh = options.batteryCapacityKwh ?? 60
@@ -85,7 +93,8 @@ export async function runEnergyAnalysis(options: {
   } else if (pvPowerKw !== null) predictedPvEnergyKwh = pvPowerKw * Math.min(horizonHours,6) * 0.65
   predictedPvEnergyKwh=+predictedPvEnergyKwh.toFixed(2)
 
-  const pumpingDemandKwh = water.pumpingEnergyKwh ?? 0
+  const pumpingDemandKwh = water.irrigationRuntimeHours !== null && water.pumpPowerKw !== null
+    ? measuredPumpEnergyKwh(water.irrigationRuntimeHours, water.pumpPowerKw) : 0
   const coolingDemandKwh = options.coolingDemandKwh ?? 18
   const processingDemandKwh = options.processingDemandKwh ?? 8
   const otherCriticalDemandKwh = options.otherCriticalDemandKwh ?? 6
