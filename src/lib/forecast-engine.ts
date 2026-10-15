@@ -99,12 +99,26 @@ export async function latestTwinState() {
   return (await listTwinStates(1))[0]
 }
 
-export async function runForecast(options: { initialStateId?: string; horizonHours?: number; stepHours?: number }): Promise<ForecastRun> {
+export async function runForecast(options: { initialStateId?: string; horizonHours?: number; stepHours?: number; forcing?: ForecastForcing[] }): Promise<ForecastRun> {
   const state = options.initialStateId ? await getTwinState(options.initialStateId) : await latestTwinState()
   if (!state) throw new Error('A persisted Twin State is required before a forecast can be run.')
   const issuedAt = new Date().toISOString()
   const horizonHours = options.horizonHours ?? 72
   const stepHours = options.stepHours ?? 3
+  if (!Number.isInteger(horizonHours) || horizonHours <= 0 || horizonHours > 720 ||
+      !Number.isInteger(stepHours) || stepHours <= 0 || horizonHours % stepHours !== 0)
+    throw new Error('Forecast horizon and step must be positive integer hours, divisible, with horizon <= 720.')
+  if (options.forcing) {
+    if (options.forcing.length !== horizonHours / stepHours + 1)
+      throw new Error('Manual forcing must cover each forecast point including lead zero.')
+    for (let i = 0; i < options.forcing.length; i++) {
+      const f = options.forcing[i]
+      if (f.leadHours !== i * stepHours || !Object.values(f).every(x => typeof x === 'number' && Number.isFinite(x))
+          || f.precipitationMm < 0 || f.referenceEtMm < 0 || f.shortwaveRadiation < 0
+          || f.windSpeed < 0 || f.relativeHumidity < 0 || f.relativeHumidity > 100)
+        throw new Error('Manual forcing must be finite, physically bounded, and ordered by leadHours.')
+    }
+  }
   const warnings: string[] = []
   if (state.aggregateQuality === 'INSUFFICIENT') warnings.push('Initial Twin State is marked INSUFFICIENT; trajectory is demonstrative and should not support operational decisions.')
   if (state.evidenceMode === 'SYNTHETIC') warnings.push('Initial state uses synthetic evidence. Forecast output is a research demonstration, not a field prediction.')
@@ -118,10 +132,10 @@ export async function runForecast(options: { initialStateId?: string; horizonHou
   const points: ForecastPoint[] = []
 
   for (let lead = 0; lead <= horizonHours; lead += stepHours) {
-    const forcing = deterministicForcing(issuedAt, lead)
-    const cropWaterDemand = +(forcing.referenceEtMm * stepHours * 0.78).toFixed(3)
+    const forcing = options.forcing?.[lead / stepHours] ?? deterministicForcing(issuedAt, lead)
+    const cropWaterDemand = lead === 0 ? 0 : +(forcing.referenceEtMm * stepHours * 0.78).toFixed(3)
     const targetSoilWater = 0.29
-    const irrigationRequirement = soilWater === null ? 0 : +Math.max(0, (targetSoilWater - soilWater) * 38).toFixed(3)
+    const irrigationRequirement = lead === 0 || soilWater === null ? 0 : +Math.max(0, (targetSoilWater - soilWater) * 38).toFixed(3)
     const pumpingEnergy = +(irrigationRequirement * 0.34).toFixed(3)
     const pvPower = initialPv === null ? null : +(Math.max(0, forcing.shortwaveRadiation / 900) * Math.max(initialPv, 28)).toFixed(2)
 
@@ -154,8 +168,8 @@ export async function runForecast(options: { initialStateId?: string; horizonHou
     id: forecastId(), initialStateId: state.id, farmId: state.farmId, zoneId: state.zoneId,
     evidenceMode: state.evidenceMode, issuedAt, horizonHours, stepHours,
     modelVersion: 'FORECAST-ENGINE-0.1.0',
-    method: 'state-initialized deterministic trajectory with simplified water-energy propagation and lead-dependent uncertainty expansion',
-    forcingSource: 'DETERMINISTIC-DEMONSTRATION',
+    method: 'state-initialized research trajectory with step-aligned forcing and simplified water-energy propagation; uncertainty bounds are not calibrated',
+    forcingSource: options.forcing ? 'MANUAL' : 'DETERMINISTIC-DEMONSTRATION',
     status: state.aggregateQuality === 'INSUFFICIENT' ? 'INSUFFICIENT_INITIAL_STATE' : 'COMPLETE', warnings, points,
   }
   await saveForecast(run)
