@@ -1,3 +1,4 @@
+import { measuredPumpEnergyKwh } from './predata-scientific-baselines'
 import { getTwinState, listTwinStates, type TwinStateEstimate } from './state-engine'
 import { listForecasts, type ForecastRun } from './forecast-engine'
 
@@ -70,6 +71,8 @@ export async function runWaterAnalysis(options: {
   const irrigationEfficiency = options.irrigationEfficiency ?? 0.90
   const areaM2 = options.areaM2 ?? 1000
 
+  if (!(Number.isFinite(targetWater) && targetWater >= 0 && targetWater <= 1 && Number.isFinite(irrigationEfficiency) && irrigationEfficiency > 0 && irrigationEfficiency <= 1 && Number.isFinite(areaM2) && areaM2 > 0)) throw new Error('Invalid water analysis settings: targetWater [0,1], efficiency (0,1], and positive area required.')
+
   const forecast24 = forecast?.points.find(p => p.leadHours === 24)
   const cropWaterDemand = forecast24?.cropWaterDemand ?? 4.8
   const effectivePrecipitation = forecast24?.forcing.precipitationMm ?? 0
@@ -82,7 +85,7 @@ export async function runWaterAnalysis(options: {
     ? irrigationVolumeM3 * 1000 / pumpFlowLmin / 60
     : null
   const pumpingEnergyKwh = irrigationRuntimeHours !== null && pumpPowerKw !== null
-    ? irrigationRuntimeHours * pumpPowerKw
+    ? measuredPumpEnergyKwh(irrigationRuntimeHours, pumpPowerKw)
     : null
 
   const threshold = 0.24
