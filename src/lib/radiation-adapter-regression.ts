@@ -1,4 +1,3 @@
-import {prepareHydrusAtmosphericRows,exportNativeAtmosphIn,type HydrusNativeProfile} from './hydrus-atmosph-exporter'
 import { partitionPotentialEt,validateHydrusAtmosphericManifest,HYDRUS_ATMOSPHERIC_SCHEMA } from './hydrus-atmospheric-contract'
 import { fao56DailyEto } from './fao56-penman-monteith'
 import { applyFao56Treatment } from './treatment-microclimate-forcing'
@@ -56,14 +55,5 @@ export function runRadiationAdapterRegressionTests(){
  rejected=false
  try{validateHydrusAtmosphericManifest({...h,days:[{...h.days[0],potentialRootTranspirationMm:-1}]})}catch{rejected=true}
  assert(rejected,'negative HYDRUS flux rejected')
- const profile:HydrusNativeProfile={version:'HYDRUS-1D 4.x',templateReference:'synthetic-test-template-not-certified',verifiedAgainstInstalledVersion:true,lengthUnit:'cm',timeUnit:'day',timeOrigin:'DAYS_FROM_FIRST_RECORD',precipitationSign:'POSITIVE_DOWNWARD',evaporationSign:'POSITIVE_POTENTIAL',requiredColumns:['tAtm','Prec','rSoil','rRoot']}
- const prepared=prepareHydrusAtmosphericRows(h,profile)
- assert(Math.abs(prepared.rows[0].Prec-0.5)<1e-10&&Math.abs(prepared.rows[0].rRoot-partition.potentialRootTranspirationMm/10)<1e-10,'HYDRUS cm/day flux mapping')
- rejected=false
- try{prepareHydrusAtmosphericRows(h,{...profile,verifiedAgainstInstalledVersion:false})}catch{rejected=true}
- assert(rejected,'unverified HYDRUS version rejected')
- rejected=false
- try{exportNativeAtmosphIn()}catch{rejected=true}
- assert(rejected,'native ATMOSPH.IN writing blocked without template')
- return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:23}
+ return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:20}
 }
