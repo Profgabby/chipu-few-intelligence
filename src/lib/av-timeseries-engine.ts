@@ -47,8 +47,10 @@ export function simulateAVTimeSeries(req:AVTimeSeriesRequest) {
     const irrigationMm=Math.max(0,req.irrigationTargetStorageMm-(storage+f.precipitationMm-etDemandMm))
     const water=waterBucketStep({storageMm:storage,precipitationMm:f.precipitationMm,irrigationMm,
       etDemandMm,capacityMm:soil.capacityMm})
+    if(!finite(req.parameters.irrigationEfficiency)||req.parameters.irrigationEfficiency<=0||req.parameters.irrigationEfficiency>1)
+      throw Error('Invalid irrigation application efficiency')
     const volumeM3=irrigationMm*req.irrigatedAreaM2/1000/req.parameters.irrigationEfficiency
-    if(!finite(volumeM3)||req.parameters.irrigationEfficiency<=0||req.parameters.irrigationEfficiency>1)
+    if(!finite(volumeM3))
       throw Error('Invalid irrigation application efficiency')
     const pumpingEnergyKwh=pumpEnergyKwh(volumeM3,req.settings.pumpHeadM,req.settings.pumpEfficiency)
     const pvProductionKwh=pvEnergyKwh(f.irradiationKwhM2,req.pvAreaM2,req.pvModuleEfficiency,req.parameters.performanceRatio)
