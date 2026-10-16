@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { AV_PREDICTION_SCHEMA, predictAV } from '../lib/versioned-av-prediction'
-import { AV_TIMESERIES_SCHEMA, simulateAVTimeSeries, type DailyForcing, type AVTimeSeriesRequest } from '../lib/av-timeseries-engine'
-import { compareDailyModels } from '../lib/av-timeseries-statistics'
+import { AVDailySimulation } from './AVDailySimulation'
 import { AV_MODELS, DEFAULT_SETTINGS, createIllustrativeParameters, type ModelId, type ModelParameters, type ComparisonSettings, type SimulationOutput } from '../lib/avModelLaboratory'
 import '../av-model-laboratory.css'
 import { AVSubsystems } from './AVSubsystems'
@@ -20,14 +19,7 @@ export function AVModelLaboratoryWorkspace() {
   const [results,setResults]=useState<SimulationOutput[]|null>(null)
   const [predictionRuns,setPredictionRuns]=useState<ReturnType<typeof predictAV>[]|null>(null)
   const [error,setError]=useState('')
-  const [dailyInput,setDailyInput]=useState('')
-  const [dailyError,setDailyError]=useState('')
-  const [dailyResults,setDailyResults]=useState<ReturnType<typeof simulateAVTimeSeries>[]|null>(null)
-  const [initialStorage,setInitialStorage]=useState(60)
-  const [capacity,setCapacity]=useState(120)
-  const [targetStorage,setTargetStorage]=useState(75)
-  const [moduleEfficiency,setModuleEfficiency]=useState(0.2)
-  const invalidate=()=>{setResults(null);setPredictionRuns(null);setDailyResults(null);setError('');setDailyError('')}
+  const invalidate=()=>{setResults(null);setPredictionRuns(null);setError('')}
   function updateSetting<K extends keyof ComparisonSettings>(key:K,value:ComparisonSettings[K]) {setSettings(s=>({...s,[key]:value}));invalidate()}
   function updateParameter(id:ModelId,key:keyof ModelParameters,value:number) {setParameters(p=>({...p,[id]:{...p[id],[key]:value}}));invalidate()}
   function choose(ids:ModelId[]) {setSelected(ids);invalidate()}
@@ -37,7 +29,6 @@ export function AVModelLaboratoryWorkspace() {
     setResults(runs.map(r=>r.result))
     setError('')
   } catch(e) {setPredictionRuns(null);setResults(null);setError(e instanceof Error?e.message:'Unable to compare models')}}
-  function runDaily() { setDailyError('Daily simulation setup is not yet complete') }
   function download() {
     if(!results) return
     const payload={schemaVersion:'av-lab-1.0',generatedAt:new Date().toISOString(),evidence:'demonstration-only',designPerformanceClaim:false,
@@ -82,6 +73,7 @@ export function AVModelLaboratoryWorkspace() {
     </form>
     {results?<AVSubsystems results={results} parameters={parameters} settings={settings}/>:null}
     <section aria-labelledby="av-results"><h2 id="av-results">4. Demonstration results</h2>{results?<><p role="status">{results.length} versioned model-specific screening run(s) · not field-validated predictions</p><button type="button" onClick={download}>Export inputs &amp; results (JSON)</button><div className="av-table-scroll" tabIndex={0} role="region" aria-label="Scrollable model comparison"><table><caption>Annual totals unless specified. Economics are incremental vs open sun and exclude crop revenue.</caption><thead><tr>{['Model','Area (ha)','PV (kW)','PV (kWh)','PV (kWh/ha)','Irrigation (m³/ha)','Water saved (%)','Pump (kWh)','CAPEX (USD)','Annualized benefit (USD/year)','NPV (USD)','Payback (years)','LCOE (USD/kWh)'].map(t=><th key={t} scope="col">{t}</th>)}</tr></thead><tbody>{results.map(r=><tr key={r.modelId}><th scope="row">{r.modelId}</th>{[format(r.areaHa,2),format(r.capacityKw,1),format(r.pvEnergyKwh),format(r.pvKwhPerHa),format(r.irrigationM3PerHa),format(r.waterSavedPct,1),format(r.pumpEnergyKwh),format(r.capitalCost),format(r.annualizedNetBenefit),format(r.npv),format(r.simplePaybackYears,1),format(r.lcoe,3)].map((v,i)=><td key={i}>{v}</td>)}</tr>)}</tbody></table></div></>:<p>Run a demonstration to see example calculations. Changing inputs clears previous results.</p>}</section>
+    <AVDailySimulation key={selected.join(',')+JSON.stringify(parameters)+JSON.stringify(settings)} selected={selected} parameters={parameters} settings={settings}/>
     <details><summary>Methods and research limits</summary><p>PV = capacity × annual plane-of-array irradiation ÷ 1 kW/m² × performance ratio. Irrigation = net depth × 10 × hectares × irrigation ratio ÷ application efficiency. Pump energy = volume × 1,000 × 9.81 × head ÷ (3,600,000 × efficiency).</p><p>Water saved compares gross applied irrigation with the same-area open-sun baseline; negative values mean more water use. A zero baseline gives N/A percent savings. The irrigation ratio is an input hypothesis, not a predicted crop response.</p><p>Economic cash flow = (PV electricity + baseline pump electricity − model pump electricity) × blended electricity value − annual OPEX. NPV discounts constant annual cash flow; annualized benefit subtracts annualized capital cost. LCOE includes capital and OPEX only. Payback is undiscounted and may exceed project life. No dispatch, export limits, degradation, replacement, tax, financing or crop income is modeled.</p><p>The optional six-subsystem daily workspace adds a simplified soil-water balance, crop water response, prescribed microclimate adjustments and daily energy allocation. Those results and their assumptions have a separate export. HYDRUS coupling, geometry-based shading, observed-data validation and uncertainty remain unavailable. This is not a validated digital twin or a recommendation to purchase a system.</p></details>
   <details><summary>SS01 engineering layout and dedicated daily simulation</summary><SS01EvidenceCase/></details></div>
 }
