@@ -37,6 +37,7 @@ export function AVModelLaboratoryWorkspace() {
     setResults(runs.map(r=>r.result))
     setError('')
   } catch(e) {setPredictionRuns(null);setResults(null);setError(e instanceof Error?e.message:'Unable to compare models')}}
+  function runDaily() { setDailyError('Daily simulation setup is not yet complete') }
   function download() {
     if(!results) return
     const payload={schemaVersion:'av-lab-1.0',generatedAt:new Date().toISOString(),evidence:'demonstration-only',designPerformanceClaim:false,
