@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { AV_PREDICTION_SCHEMA, predictAV } from '../lib/versioned-av-prediction'
+import { AV_TIMESERIES_SCHEMA, simulateAVTimeSeries, type DailyForcing, type AVTimeSeriesRequest } from '../lib/av-timeseries-engine'
+import { compareDailyModels } from '../lib/av-timeseries-statistics'
 import { AV_MODELS, DEFAULT_SETTINGS, createIllustrativeParameters, type ModelId, type ModelParameters, type ComparisonSettings, type SimulationOutput } from '../lib/avModelLaboratory'
 import '../av-model-laboratory.css'
 import { AVSubsystems } from './AVSubsystems'
@@ -18,7 +20,14 @@ export function AVModelLaboratoryWorkspace() {
   const [results,setResults]=useState<SimulationOutput[]|null>(null)
   const [predictionRuns,setPredictionRuns]=useState<ReturnType<typeof predictAV>[]|null>(null)
   const [error,setError]=useState('')
-  const invalidate=()=>{setResults(null);setPredictionRuns(null);setError('')}
+  const [dailyInput,setDailyInput]=useState('')
+  const [dailyError,setDailyError]=useState('')
+  const [dailyResults,setDailyResults]=useState<ReturnType<typeof simulateAVTimeSeries>[]|null>(null)
+  const [initialStorage,setInitialStorage]=useState(60)
+  const [capacity,setCapacity]=useState(120)
+  const [targetStorage,setTargetStorage]=useState(75)
+  const [moduleEfficiency,setModuleEfficiency]=useState(0.2)
+  const invalidate=()=>{setResults(null);setPredictionRuns(null);setDailyResults(null);setError('');setDailyError('')}
   function updateSetting<K extends keyof ComparisonSettings>(key:K,value:ComparisonSettings[K]) {setSettings(s=>({...s,[key]:value}));invalidate()}
   function updateParameter(id:ModelId,key:keyof ModelParameters,value:number) {setParameters(p=>({...p,[id]:{...p[id],[key]:value}}));invalidate()}
   function choose(ids:ModelId[]) {setSelected(ids);invalidate()}
