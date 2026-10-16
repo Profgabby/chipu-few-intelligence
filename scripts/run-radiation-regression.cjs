@@ -6,10 +6,11 @@ const {pathToFileURL}=require('node:url')
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chipu-radiation-'))
 ;(async()=>{
  try{
-  for(const name of ['geometry-registry','radiation-forcing-adapter','radiation-adapter-regression','treatment-microclimate-forcing']){
+  for(const name of ['geometry-registry','radiation-forcing-adapter','radiation-adapter-regression','treatment-microclimate-forcing','fao56-penman-monteith']){
    let source=fs.readFileSync(path.join('src/lib',name+'.ts'),'utf8')
    source=source.replaceAll("'./geometry-registry'","'./geometry-registry.ts'").replaceAll("'./radiation-forcing-adapter'","'./radiation-forcing-adapter.ts'")
    source=source.replaceAll("'./treatment-microclimate-forcing'","'./treatment-microclimate-forcing.ts'")
+   source=source.replaceAll("'./fao56-penman-monteith'","'./fao56-penman-monteith.ts'")
    fs.writeFileSync(path.join(dir,name+'.ts'),source)
   }
   const suite=await import(pathToFileURL(path.join(dir,'radiation-adapter-regression.ts')).href)
