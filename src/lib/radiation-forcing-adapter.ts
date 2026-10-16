@@ -16,7 +16,7 @@ export function adaptHourlyRadiation(modelId:GeometryId,input:RadiationInput):Ra
  for(const hour of input.hours){
   if(!/^\d{4}-\d{2}-\d{2}T\d{2}:00:00Z$/.test(hour.timestampUtc))throw Error('Timestamp must be UTC at exact hourly boundaries')
   const ms=Date.parse(hour.timestampUtc)
-  if(!Number.isFinite(ms)||new Date(ms).toISOString()!==hour.timestampUtc||(!Number.isNaN(prev)&&ms-prev!==3600000))throw Error('Hourly timestamps must be valid, unique and contiguous')
+  if(!Number.isFinite(ms)||new Date(ms).toISOString().replace('.000Z','Z')!==hour.timestampUtc||(!Number.isNaN(prev)&&ms-prev!==3600000))throw Error('Hourly timestamps must be valid, unique and contiguous')
   prev=ms
   if(![hour.ghiKwhM2,hour.dhiKwhM2,hour.poaKwhM2,hour.cellTempC].every(Number.isFinite)||hour.ghiKwhM2<0||hour.dhiKwhM2<0||hour.dhiKwhM2>hour.ghiKwhM2||hour.poaKwhM2<0)throw Error('Invalid hourly irradiance or temperature')
   const date=hour.timestampUtc.slice(0,10)
