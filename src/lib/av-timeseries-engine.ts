@@ -16,6 +16,8 @@ export type AVTimeSeriesRequest = {
   soil:DailySoilInput; forcing:DailyForcing[]
   pvAreaM2:number; pvModuleEfficiency:number; irrigatedAreaM2:number
   irrigationTargetStorageMm:number
+  /** Explicit ETo forcing multiplier; scenario assumption, never inferred from model ID. */
+  etoMultiplier?:number
 }
 const finite=(n:number)=>Number.isFinite(n)
 export function simulateAVTimeSeries(req:AVTimeSeriesRequest) {
@@ -29,6 +31,7 @@ export function simulateAVTimeSeries(req:AVTimeSeriesRequest) {
     ||req.irrigatedAreaM2<=0||req.pvAreaM2<0||req.pvModuleEfficiency<0||req.pvModuleEfficiency>1
     ||req.irrigationTargetStorageMm<0||req.irrigationTargetStorageMm>soil.capacityMm)
     throw Error('Invalid soil, area or PV parameters')
+  if(!finite(req.etoMultiplier ?? 1)||(req.etoMultiplier ?? 1)<0||(req.etoMultiplier ?? 1)>2) throw Error('Invalid ETo multiplier')
   let storage=soil.initialStorageMm
   let previous=''
   let totalIrrigationMm=0,totalPumpKwh=0,totalPvKwh=0,totalEtMm=0
@@ -43,7 +46,7 @@ export function simulateAVTimeSeries(req:AVTimeSeriesRequest) {
     if(![f.precipitationMm,f.etoMm,f.irradiationKwhM2,f.cropCoefficient,f.transmittedFraction].every(finite)
       ||f.precipitationMm<0||f.etoMm<0||f.irradiationKwhM2<0||f.cropCoefficient<0
       ||f.transmittedFraction<0||f.transmittedFraction>1) throw Error('Invalid daily forcing')
-    const etDemandMm=cropEtMm(f.etoMm,f.cropCoefficient)
+    const etDemandMm=cropEtMm(f.etoMm*(req.etoMultiplier ?? 1),f.cropCoefficient)
     const irrigationMm=Math.max(0,req.irrigationTargetStorageMm-(storage+f.precipitationMm-etDemandMm))
     const water=waterBucketStep({storageMm:storage,precipitationMm:f.precipitationMm,irrigationMm,
       etDemandMm,capacityMm:soil.capacityMm})
@@ -65,6 +68,7 @@ export function simulateAVTimeSeries(req:AVTimeSeriesRequest) {
       transmittedIrradiationKwhM2:f.irradiationKwhM2*f.transmittedFraction}
   })
   return {schemaVersion:AV_TIMESERIES_SCHEMA,modelId:req.modelId,sourceType:req.sourceType,
+    etoMultiplier:req.etoMultiplier ?? 1,
     validationStatus:'NOT_FIELD_VALIDATED' as const,modelVersion:'AV-DAILY-BUCKET-0.1.0',
     points,summary:{days:points.length,totalIrrigationMm,totalPumpKwh,totalPvKwh,totalEtMm,
       maxAbsWaterResidualMm:Math.max(...points.map(p=>Math.abs(p.waterResidualMm)))},
