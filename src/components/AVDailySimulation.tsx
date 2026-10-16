@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { applyTreatmentMicroclimate, type MicroclimateRequest } from '../lib/treatment-microclimate-forcing'
 import { RadiationAdapterPanel } from './RadiationAdapterPanel'
 import type { PlaceProfile } from '../lib/place-profile'
 import type { ModelId, ModelParameters, ComparisonSettings } from '../lib/avModelLaboratory'
@@ -17,6 +18,8 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
  const [capacity,setCapacity]=useState(120)
  const [target,setTarget]=useState(75)
  const [efficiency,setEfficiency]=useState(.2)
+ const [microclimateJson,setMicroclimateJson]=useState('')
+ const [microclimateApplied,setMicroclimateApplied]=useState<MicroclimateRequest[]|null>(null)
  const [etoByModel,setEtoByModel]=useState<Partial<Record<ModelId,number>>>({})
  const [error,setError]=useState('')
  const [radiationManifest,setRadiationManifest]=useState<unknown>(null)
@@ -37,19 +40,27 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
    const control=simulateAVTimeSeries({...shared,modelId:selected[0],
     parameters:{...base,irrigationEfficiency:settings.baselineIrrigationEfficiency,performanceRatio:0},
     pvAreaM2:0,etoMultiplier:1})
+   const microRequests:MicroclimateRequest[]=microclimateJson.trim()?JSON.parse(microclimateJson):[]
+   if(!Array.isArray(microRequests))throw Error('Microclimate forcing must be an array')
+   if(new Set(microRequests.map(m=>m.designId)).size!==microRequests.length)throw Error('Duplicate treatment microclimate design')
+   if(microRequests.some(m=>!selected.includes(m.designId as ModelId)))throw Error('Microclimate forcing refers to an unselected design')
+   if(microRequests.some(m=>m.siteId!==profile.id))throw Error('Microclimate site does not match active profile')
    const treatments=selected.map(modelId=>{
     const p=parameters[modelId]
-    return simulateAVTimeSeries({...shared,modelId,parameters:p,
+    const micro=microRequests.find(m=>m.designId===modelId)
+    if(micro&&etoByModel[modelId]!==undefined&&etoByModel[modelId]!==1)throw Error('Do not combine measured treatment ETo with an ETo multiplier')
+    const treatmentForcing=micro?applyTreatmentMicroclimate(forcing,micro).treatment:forcing
+    return simulateAVTimeSeries({...shared,forcing:treatmentForcing,modelId,parameters:p,
      pvAreaM2:settings.areaHa*p.pvKwPerHa/efficiency,
      etoMultiplier:etoByModel[modelId]??1})
    })
-   setRuns({control,treatments,areas:treatments.map(()=>settings.areaHa)});setError('')
+   setMicroclimateApplied(microRequests);setRuns({control,treatments,areas:treatments.map(()=>settings.areaHa)});setError('')
   }catch(e){setRuns(null);setError(e instanceof Error?e.message:'Simulation failed')}
  }
  function download(){
   if(!runs)return
   const payload={schemaVersion:AV_TIMESERIES_SCHEMA,evidence:forcingSource==='EXAMPLE'?'SYNTHETIC_EXAMPLE':'USER_SUPPLIED_UNVALIDATED',
-   activeLocation:profile,radiationManifest,
+   activeLocation:profile,radiationManifest,treatmentMicroclimate:microclimateApplied,
    settings:{initial,capacity,target,efficiency,etoByModel,comparison:settings},forcing:JSON.parse(weather),
    openField:runs.control,agrivoltaic:runs.treatments}
   const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}))
@@ -68,6 +79,7 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
   <h3>Design-specific microclimate hypotheses</h3>
   <p>Enter each design's ratio of daily reference ET to open-field ETo. Use 1.00 unless a measured or externally modeled microclimate adjustment is available. Different PV capacities alone do not imply water savings.</p>
   <div className="av-fields">{selected.map(id=><div key={id}>{input(id+' ETo / open-field ETo',etoByModel[id]??1,v=>setEtoByModel(old=>({...old,[id]:v})))}</div>)}</div>
+  <details><summary>Experimental treatment-specific microclimate ETo (opt-in)</summary><p>Enter a JSON array of treatment records: source (MEASURED, EXTERNAL_MODEL or ILLUSTRATIVE_SCENARIO), sourceReference, method, siteId (matching the active location), designId and days containing date and etoMm. Each treatment must cover all open-field dates. Radiation transmission alone never modifies ETo. A treatment record overrides that design's ETo multiplier, which must remain 1.00.</p><textarea aria-label="Treatment-specific ETo forcing JSON" style={{width:'100%',minHeight:140,fontFamily:'monospace'}} value={microclimateJson} placeholder='[{"source":"MEASURED","sourceReference":"dataset-id","method":"FAO-56 PM with measured treatment weather","siteId":"site-id","designId":"SS01","days":[{"date":"2026-07-01","etoMm":3.8}]}]' onChange={e=>{setMicroclimateJson(e.target.value);setRuns(null);setMicroclimateApplied(null)}}/></details>
   <label style={{display:'grid',gap:8}}>Daily weather forcing JSON
    <textarea style={{width:'100%',minHeight:240,boxSizing:'border-box',fontFamily:'monospace',fontSize:13}} value={weather} onChange={e=>{setWeather(e.target.value);setForcingSource('USER_SUPPLIED');setRadiationManifest(null);setRuns(null)}}/>
   </label>
