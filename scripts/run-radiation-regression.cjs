@@ -6,7 +6,7 @@ const {pathToFileURL}=require('node:url')
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chipu-radiation-'))
 ;(async()=>{
  try{
-  for(const name of ['geometry-registry','radiation-forcing-adapter','radiation-adapter-regression','treatment-microclimate-forcing','fao56-penman-monteith','hydrus-atmospheric-contract','paired-daily-acceptance','av-timeseries-engine','avModelLaboratory','predata-scientific-baselines','crop-registry','hydrus-atmosph-exporter','multicrop-acceptance','hydrus-417-records','hydrus-417-records-acceptance']){
+  for(const name of ['geometry-registry','radiation-forcing-adapter','radiation-adapter-regression','treatment-microclimate-forcing','fao56-penman-monteith','hydrus-atmospheric-contract','paired-daily-acceptance','av-timeseries-engine','avModelLaboratory','predata-scientific-baselines','crop-registry','hydrus-atmosph-exporter','multicrop-acceptance','hydrus-417-records','hydrus-417-records-acceptance','hydrus-417-manifest-mapper','hydrus-417-mapper-acceptance']){
    let source=fs.readFileSync(path.join('src/lib',name+'.ts'),'utf8')
    source=source.replaceAll("'./geometry-registry'","'./geometry-registry.ts'").replaceAll("'./radiation-forcing-adapter'","'./radiation-forcing-adapter.ts'")
    source=source.replaceAll("'./treatment-microclimate-forcing'","'./treatment-microclimate-forcing.ts'")
@@ -15,6 +15,7 @@ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chipu-radiation-'))
    for(const dep of ['paired-daily-acceptance','av-timeseries-engine','avModelLaboratory','predata-scientific-baselines'])source=source.replaceAll("'./"+dep+"'","'./"+dep+".ts'")
    for(const dep of ['crop-registry','hydrus-atmosph-exporter','multicrop-acceptance'])source=source.replaceAll("'./"+dep+"'","'./"+dep+".ts'")
    for(const dep of ['hydrus-417-records','hydrus-417-records-acceptance'])source=source.replaceAll("'./"+dep+"'","'./"+dep+".ts'")
+   for(const dep of ['hydrus-417-manifest-mapper','hydrus-417-mapper-acceptance'])source=source.replaceAll("'./"+dep+"'","'./"+dep+".ts'")
    fs.writeFileSync(path.join(dir,name+'.ts'),source)
   }
   const suite=await import(pathToFileURL(path.join(dir,'radiation-adapter-regression.ts')).href)
@@ -26,6 +27,9 @@ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chipu-radiation-'))
   if(!multicrop.passed)throw Error('Multi-crop acceptance failed')
   const hydrus=(await import(pathToFileURL(path.join(dir,'hydrus-417-records-acceptance.ts')).href)).runHydrus417RecordAcceptance()
   if(!hydrus.passed)throw Error('HYDRUS record acceptance failed')
+  const mapper=(await import(pathToFileURL(path.join(dir,'hydrus-417-mapper-acceptance.ts')).href)).runHydrus417MapperAcceptance()
+  if(!mapper.passed)throw Error('HYDRUS manifest mapper acceptance failed')
+  process.stdout.write('HYDRUS mapper acceptance PASS '+JSON.stringify(mapper)+'\n')
   process.stdout.write('HYDRUS record acceptance PASS '+JSON.stringify(hydrus)+'\n')
   process.stdout.write('Multi-crop acceptance PASS '+JSON.stringify(multicrop)+'\n')
   process.stdout.write('Paired daily acceptance PASS '+JSON.stringify(paired)+'\n')
