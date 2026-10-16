@@ -1,3 +1,4 @@
+import { applyTreatmentMicroclimate } from './treatment-microclimate-forcing'
 import { GEOMETRY_REGISTRY,geometryMetrics,validateGeometry,radiationPartition,solarPosition } from './geometry-registry'
 import { adaptHourlyRadiation,attachRadiationToDailyForcing,type HourlyRadiation } from './radiation-forcing-adapter'
 /** Deterministic research smoke tests; call explicitly from a test runner. */
@@ -21,5 +22,15 @@ export function runRadiationAdapterRegressionTests(){
  rejected=false
  try{attachRadiationToDailyForcing([{...forcing[0],irradiationKwhM2:5}],days)}catch{rejected=true}
  assert(rejected,'daily GHI mismatch rejected')
- return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:8}
+ const source={source:'MEASURED' as const,sourceReference:'synthetic-test-reference',method:'independent test ETo',siteId:'site-test',designId:'SS01',days:[{date:'2026-07-01',etoMm:2}]}
+ const paired=applyTreatmentMicroclimate(forcing,source)
+ assert(paired.control[0].etoMm===4&&paired.treatment[0].etoMm===2,'treatment ETo isolated from open-field control')
+ assert(paired.treatment[0].transmittedFraction===forcing[0].transmittedFraction,'radiation fraction preserved')
+ rejected=false
+ try{applyTreatmentMicroclimate(forcing,{...source,days:[{date:'2026-07-02',etoMm:2}]})}catch{rejected=true}
+ assert(rejected,'mismatched microclimate date rejected')
+ rejected=false
+ try{applyTreatmentMicroclimate(forcing,{...source,sourceReference:' '})}catch{rejected=true}
+ assert(rejected,'missing provenance rejected')
+ return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:12}
 }
