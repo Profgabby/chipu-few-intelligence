@@ -3,7 +3,7 @@
 ## Architecture decision
 All model designs use a shared water/energy/scenario scientific engine. Model geometry and microclimate are inputs, not separate hardcoded governing equations.
 
-The **proposed** ID family is SS01–SS05, MS01–MS05, CS01–CS05, RT01–RT05 (20 configurations), plus OPEN_FIELD. This research registry is not yet confirmed as matching the application's existing Model Laboratory catalogue. The actual application catalogue must be reconciled before wiring UI selectors.
+The **verified application catalogue** in `src/lib/avModelLaboratory.ts` has 15 models: SS01–SS05, MS01–MS05, CS01–CS05. RT01–RT05 are not present in the live catalogue. The separate Python research registry includes five proposed RT configurations; they are NOT selectable in the UI and must not be counted as integrated. OPEN_FIELD is an analytical comparison baseline, not an AV gallery card.
 
 ## Required per-model parameter provenance
 - PV area, module efficiency, performance ratio, row geometry and tracker configuration
@@ -22,13 +22,13 @@ The **proposed** ID family is SS01–SS05, MS01–MS05, CS01–CS05, RT01–RT05
 6. Reporting: include model ID, input provenance, parameter versions, equations, warnings and uncertainty status.
 
 ## Current code integration
-`research/predata/model_lab.py` provides a pure, offline scientific baseline for all proposed IDs, paired comparison and validation. It is **not** connected to the browser Model Laboratory, persistence, HYDRUS output importer, or historical weather ingestion. Those remain release-blocking integration tasks.
+`research/predata/model_lab.py` provides a pure, offline scientific baseline for all proposed IDs, paired comparison and validation. The browser Model Laboratory now invokes a TypeScript versioned screening adapter (`src/lib/versioned-av-prediction.ts`) for each selected registered design. The Python scientific module is **not** connected to the browser runtime, persistence, HYDRUS output importer, or historical weather ingestion. Those remain release-blocking integration tasks.
 
 ## Scientific restrictions
 No fixed shading coefficient, crop-yield gain, evapotranspiration reduction or PV increase is assigned merely from an AV design ID. Model-specific performance must follow actual geometry, forcing, calibration or explicitly labeled assumptions.
 
 ## Release gates
-- Verify actual Model Laboratory catalogue and map stable IDs.
+- Verified: actual 15-model catalogue and stable IDs. Reconcile Python registry before promoting it as a backend.
 - Connect user-selected model to a versioned prediction request and result.
 - Add weather/HYDRUS import adapters and unit/QC checks.
 - Add browser workflow, storage, export and permission tests.
