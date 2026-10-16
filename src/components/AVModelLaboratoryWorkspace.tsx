@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { AV_PREDICTION_SCHEMA, predictAV } from '../lib/versioned-av-prediction'
-import { AV_MODELS, DEFAULT_SETTINGS, compareAV, createIllustrativeParameters, type ModelId, type ModelParameters, type ComparisonSettings, type SimulationOutput } from '../lib/avModelLaboratory'
+import { AV_MODELS, DEFAULT_SETTINGS, createIllustrativeParameters, type ModelId, type ModelParameters, type ComparisonSettings, type SimulationOutput } from '../lib/avModelLaboratory'
 import '../av-model-laboratory.css'
 import { AVSubsystems } from './AVSubsystems'
 import { SS01EvidenceCase } from './SS01EvidenceCase'
-import { simulateAV } from '../lib/avModelLaboratory'
 
 type NumberFieldProps = { label:string; value:number; onChange:(value:number)=>void; min?:number; max?:number; step?:number }
 function NumberField({label,value,onChange,min=0,max,step=0.01}:NumberFieldProps) {
