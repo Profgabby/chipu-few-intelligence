@@ -1,14 +1,13 @@
-// Isolated build-time regression runner. esbuild is installed transitively by Vite.
-const esbuild=require('esbuild')
-const {mkdtempSync,rmSync}=require('node:fs')
-const {tmpdir}=require('node:os')
-const {join}=require('node:path')
-const dir=mkdtempSync(join(tmpdir(),'chipu-radiation-'))
+// Execute TypeScript regression modules with the project's direct TypeScript dependency.
+const ts=require('typescript')
+const fs=require('node:fs')
+require.extensions['.ts']=(module,filename)=>{
+ const source=fs.readFileSync(filename,'utf8')
+ const compiled=ts.transpileModule(source,{fileName:filename,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}})
+ module._compile(compiled.outputText,filename)
+}
 try{
- const output=join(dir,'regression.cjs')
- esbuild.buildSync({entryPoints:['src/lib/radiation-adapter-regression.ts'],bundle:true,platform:'node',format:'cjs',target:'node20',outfile:output})
- const report=require(output).runRadiationAdapterRegressionTests()
+ const report=require('../src/lib/radiation-adapter-regression.ts').runRadiationAdapterRegressionTests()
  if(!report.passed)throw Error('Radiation regression returned failure')
  process.stdout.write('Radiation acceptance gate PASS '+JSON.stringify(report)+'\n')
 }catch(error){console.error('Radiation acceptance gate FAIL',error);process.exitCode=1}
-finally{rmSync(dir,{recursive:true,force:true})}
