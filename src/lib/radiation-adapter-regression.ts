@@ -1,3 +1,4 @@
+import { partitionPotentialEt,validateHydrusAtmosphericManifest,HYDRUS_ATMOSPHERIC_SCHEMA } from './hydrus-atmospheric-contract'
 import { fao56DailyEto } from './fao56-penman-monteith'
 import { applyFao56Treatment } from './treatment-microclimate-forcing'
 import { applyTreatmentMicroclimate } from './treatment-microclimate-forcing'
@@ -45,5 +46,14 @@ export function runRadiationAdapterRegressionTests(){
  rejected=false
  try{fao56DailyEto({...w,relativeHumidityMinPct:110})}catch{rejected=true}
  assert(rejected,'invalid FAO-56 humidity rejected')
- return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:16}
+ const faoPublished=fao56DailyEto({date:'2026-07-06',latitudeDeg:50.8,elevationM:100,dayOfYear:187,tmaxC:21.5,tminC:12.3,relativeHumidityMaxPct:84,relativeHumidityMinPct:63,windSpeed2mMps:2.078,solarRadiationMjM2Day:22.07})
+ assert(Math.abs(faoPublished.etoMm-3.9)<0.15,'FAO-56 published Example 18 reference ETo 3.9 mm/day')
+ const partition=partitionPotentialEt(4,0.9,2,0.6)
+ assert(Math.abs(partition.potentialRootTranspirationMm+partition.potentialSoilEvaporationMm-3.6)<1e-10,'potential ET partition conservation')
+ const h={schemaVersion:HYDRUS_ATMOSPHERIC_SCHEMA,treatment:'OPEN_FIELD' as const,siteId:'test-site',designId:null,sourceReference:'controlled-test',partitionMethod:'illustrative',irrigationMethod:'threshold',rootUptakeModel:'FEDDES' as const,soilHydraulicParameterSetId:'loam-test',lowerBoundaryCondition:'free drainage',initialConditionReference:'test initial profile',days:[{date:'2026-07-01',precipitationMm:0,irrigationMm:5,potentialSoilEvaporationMm:partition.potentialSoilEvaporationMm,potentialRootTranspirationMm:partition.potentialRootTranspirationMm,leafAreaIndex:2,rootDepthCm:30}]}
+ assert(validateHydrusAtmosphericManifest(h).valid,'HYDRUS atmospheric contract accepted')
+ rejected=false
+ try{validateHydrusAtmosphericManifest({...h,days:[{...h.days[0],potentialRootTranspirationMm:-1}]})}catch{rejected=true}
+ assert(rejected,'negative HYDRUS flux rejected')
+ return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:20}
 }
