@@ -1,3 +1,5 @@
+import { fao56DailyEto } from './fao56-penman-monteith'
+import { applyFao56Treatment } from './treatment-microclimate-forcing'
 import { applyTreatmentMicroclimate } from './treatment-microclimate-forcing'
 import { GEOMETRY_REGISTRY,geometryMetrics,validateGeometry,radiationPartition,solarPosition } from './geometry-registry'
 import { adaptHourlyRadiation,attachRadiationToDailyForcing,type HourlyRadiation } from './radiation-forcing-adapter'
@@ -32,5 +34,16 @@ export function runRadiationAdapterRegressionTests(){
  rejected=false
  try{applyTreatmentMicroclimate(forcing,{...source,sourceReference:' '})}catch{rejected=true}
  assert(rejected,'missing provenance rejected')
- return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:12}
+ const w={date:'2026-07-01',latitudeDeg:45,elevationM:100,dayOfYear:182,tmaxC:28,tminC:14,relativeHumidityMaxPct:85,relativeHumidityMinPct:35,windSpeed2mMps:2,solarRadiationMjM2Day:23}
+ const pm=fao56DailyEto(w)
+ assert(pm.etoMm>0&&pm.etoMm<15,'FAO-56 physically plausible positive ETo')
+ const coupled=applyFao56Treatment(forcing,{...source,weather:[w]})
+ assert(Math.abs(coupled.treatment[0].etoMm-pm.etoMm)<1e-10&&coupled.control[0].etoMm===4,'FAO-56 treatment isolation')
+ rejected=false
+ try{applyFao56Treatment(forcing,{...source,weather:[{...w,dayOfYear:1}]})}catch{rejected=true}
+ assert(rejected,'invalid FAO-56 day-of-year rejected')
+ rejected=false
+ try{fao56DailyEto({...w,relativeHumidityMinPct:110})}catch{rejected=true}
+ assert(rejected,'invalid FAO-56 humidity rejected')
+ return {passed:true,designs:GEOMETRY_REGISTRY.length,cases:16}
 }
