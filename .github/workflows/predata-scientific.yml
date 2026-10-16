@@ -1,0 +1,29 @@
+name: Pre-data scientific checks
+on:
+  push:
+    branches: [feature/predata-scientific-foundation]
+  pull_request:
+    paths:
+      - 'research/predata/**'
+      - 'src/lib/predata-scientific-baselines.ts'
+      - 'src/lib/water-intelligence-engine.ts'
+      - '.github/workflows/predata-scientific.yml'
+jobs:
+  python-baselines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s research -p 'test_*.py' -t .
+  typescript-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
