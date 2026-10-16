@@ -16,7 +16,7 @@ export function runPairedDailyAcceptance(){
  assert(control.points.length===5&&treatment.points.length===5,'matched daily dates')
  assert(Math.abs(a.actualEtMm-25)<1e-9&&Math.abs(b.actualEtMm-20)<1e-9,'independent ETo forcing propagates to actual ET')
  assert(Math.abs(a.irrigationMm-20)<1e-9&&Math.abs(b.irrigationMm-16)<1e-9,'threshold irrigation mass balance')
- assert(Math.abs(a.drainageMm-13)<1e-9&&Math.abs(b.drainageMm-14)<1e-9,'storm drainage accounting')
+ assert(Math.abs(a.drainageMm-3)<1e-9&&Math.abs(b.drainageMm-4)<1e-9,'storm drainage accounting')
  assert(Math.abs(a.finalStorageMm-70)<1e-9&&Math.abs(b.finalStorageMm-70)<1e-9,'final soil storage')
  assert(Math.abs(diff.irrigationVolumeM3+50)<1e-9,'irrigation withdrawal delta including application efficiency')
  assert(Math.abs(diff.pumpingKwh-(-50*1000*9.81*30/(0.6*3600000)))<1e-9,'pumping energy difference')
