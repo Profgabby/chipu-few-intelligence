@@ -10,7 +10,7 @@ export function runPairedDailyAcceptance(){
  const shared={schemaVersion:AV_TIMESERIES_SCHEMA,modelId:'SS01' as const,sourceType:'SYNTHETIC' as const,parameters,settings:DEFAULT_SETTINGS,soil:{initialStorageMm:70,capacityMm:80},pvAreaM2:0,pvModuleEfficiency:0.2,irrigatedAreaM2:10000,irrigationTargetStorageMm:70}
  const control=simulateAVTimeSeries({...shared,forcing:paired.control})
  const treatment=simulateAVTimeSeries({...shared,forcing:paired.treatment})
- const totals=(r:typeof control)=>({irrigationMm:r.summary.totalIrrigationMm,irrigationVolumeM3:r.summary.totalIrrigationMm*shared.irrigatedAreaM2/1000/parameters.irrigationEfficiency,pumpingKwh:r.summary.totalPumpKwh,actualEtMm:r.summary.totalEtMm,drainageMm:r.points.reduce((s,p)=>s+p.drainageMm,0),finalStorageMm:r.points.at(-1)!.storageMm})
+ const totals=(r:typeof control)=>({irrigationMm:r.summary.totalIrrigationMm,irrigationVolumeM3:r.summary.totalIrrigationMm*shared.irrigatedAreaM2/1000/parameters.irrigationEfficiency,pumpingKwh:r.summary.totalPumpKwh,actualEtMm:r.summary.totalEtMm,drainageMm:r.points.reduce((s,p)=>s+p.drainageMm,0),finalStorageMm:r.points[r.points.length-1].storageMm})
  const a=totals(control),b=totals(treatment)
  const diff={irrigationMm:b.irrigationMm-a.irrigationMm,irrigationVolumeM3:b.irrigationVolumeM3-a.irrigationVolumeM3,pumpingKwh:b.pumpingKwh-a.pumpingKwh,actualEtMm:b.actualEtMm-a.actualEtMm,drainageMm:b.drainageMm-a.drainageMm,finalStorageMm:b.finalStorageMm-a.finalStorageMm}
  assert(control.points.length===5&&treatment.points.length===5,'matched daily dates')
