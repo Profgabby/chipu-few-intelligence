@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { RadiationAdapterPanel } from './RadiationAdapterPanel'
 import type { PlaceProfile } from '../lib/place-profile'
 import type { ModelId, ModelParameters, ComparisonSettings } from '../lib/avModelLaboratory'
 import { AV_TIMESERIES_SCHEMA, simulateAVTimeSeries, type DailyForcing, type AVTimeSeriesRequest } from '../lib/av-timeseries-engine'
@@ -18,6 +19,7 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
  const [efficiency,setEfficiency]=useState(.2)
  const [etoByModel,setEtoByModel]=useState<Partial<Record<ModelId,number>>>({})
  const [error,setError]=useState('')
+ const [radiationManifest,setRadiationManifest]=useState<unknown>(null)
  const [forcingSource,setForcingSource]=useState<'EXAMPLE'|'USER_SUPPLIED'>('EXAMPLE')
  const [runs,setRuns]=useState<{control:Result;treatments:Result[];areas:number[]}|null>(null)
  const input=(label:string,value:number,change:(v:number)=>void)=><label style={{display:'flex',flexDirection:'column',gap:4}}>{label}<input type="number" step="any" value={value} onChange={e=>{change(e.target.valueAsNumber);setRuns(null)}}/></label>
@@ -47,7 +49,7 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
  function download(){
   if(!runs)return
   const payload={schemaVersion:AV_TIMESERIES_SCHEMA,evidence:forcingSource==='EXAMPLE'?'SYNTHETIC_EXAMPLE':'USER_SUPPLIED_UNVALIDATED',
-   activeLocation:profile,
+   activeLocation:profile,radiationManifest,
    settings:{initial,capacity,target,efficiency,etoByModel,comparison:settings},forcing:JSON.parse(weather),
    openField:runs.control,agrivoltaic:runs.treatments}
   const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}))
@@ -67,8 +69,9 @@ export function AVDailySimulation({selected,parameters,settings,profile}:{select
   <p>Enter each design's ratio of daily reference ET to open-field ETo. Use 1.00 unless a measured or externally modeled microclimate adjustment is available. Different PV capacities alone do not imply water savings.</p>
   <div className="av-fields">{selected.map(id=><div key={id}>{input(id+' ETo / open-field ETo',etoByModel[id]??1,v=>setEtoByModel(old=>({...old,[id]:v})))}</div>)}</div>
   <label style={{display:'grid',gap:8}}>Daily weather forcing JSON
-   <textarea style={{width:'100%',minHeight:240,boxSizing:'border-box',fontFamily:'monospace',fontSize:13}} value={weather} onChange={e=>{setWeather(e.target.value);setForcingSource('USER_SUPPLIED');setRuns(null)}}/>
+   <textarea style={{width:'100%',minHeight:240,boxSizing:'border-box',fontFamily:'monospace',fontSize:13}} value={weather} onChange={e=>{setWeather(e.target.value);setForcingSource('USER_SUPPLIED');setRadiationManifest(null);setRuns(null)}}/>
   </label>
+  <RadiationAdapterPanel profile={profile} selected={selected} weather={weather} onApply={(forcing,manifest)=>{setWeather(JSON.stringify(forcing,null,2));setRadiationManifest(manifest);setForcingSource('USER_SUPPLIED');setRuns(null);setError('')}}/>
   <div className="av-toolbar"><button type="button" className="av-primary" onClick={run}>Run AV vs open field</button>
    {runs?<button type="button" onClick={download}>Export daily research JSON</button>:null}</div>
   {error?<p role="alert">{error}</p>:null}
