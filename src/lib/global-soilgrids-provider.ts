@@ -9,10 +9,10 @@ export function parseSoilGridsProperties(payload:unknown,source:EnvironmentalSou
  const out:SoilGridsLayer[]=[]
  for(const layer of layers){
   const factor=layer.unit_measure?.d_factor
-  if(!layer.name?.trim()||!Number.isFinite(factor)||factor!<=0||!Array.isArray(layer.depths))throw Error('Invalid SoilGrids metadata')
+  if(!layer.name?.trim()||!Number.isFinite(factor)||(factor ?? 0)<=0||!Array.isArray(layer.depths))throw Error('Invalid SoilGrids metadata')
   for(const d of layer.depths){
    const raw=d.values?.mean
-   if(!d.label?.trim()||!Number.isFinite(raw)||raw!<0)throw Error('SoilGrids missing property estimate')
+   if(!d.label?.trim()||!Number.isFinite(raw)||(raw ?? -1)<0)throw Error('SoilGrids missing property estimate')
    out.push({name:layer.name,depth:d.label,unit:layer.unit_measure?.mapped_units||'SOURCE_UNSPECIFIED',value:raw!/factor!,conversionFactor:factor!})
   }
  }
