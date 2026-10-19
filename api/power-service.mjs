@@ -1,3 +1,4 @@
+import {createDurableCache} from './durable-cache.mjs'
 /** Server-only POWER transport. Ephemeral per-instance cache; not a distributed persistent cache. */
 const cache=new Map()
 const TTL=6*60*60*1000
@@ -14,10 +15,12 @@ export function powerUrl(q){
  const p=new URLSearchParams({parameters:'PRECTOTCORR,ALLSKY_SFC_SW_DWN',community:'AG',longitude:String(v.longitude),latitude:String(v.latitude),start:v.start,end:v.end,format:'JSON'})
  return 'https://power.larc.nasa.gov/api/temporal/daily/point?'+p
 }
-export async function retrievePower(q,{fetcher=fetch,now=Date.now()}={}){
+export async function retrievePower(q,{fetcher=fetch,now=Date.now(),durable=createDurableCache()}={}){
  const url=powerUrl(q)
  const cached=cache.get(url)
  if(cached&&cached.expires>now)return {...cached.value,cache:'HIT_EPHEMERAL'}
+ const key=url
+ if(durable){const shared=await durable.get(key);if(shared){cache.set(url,{value:shared,expires:now+TTL});return {...shared,cache:'HIT_DURABLE'}}}
  const response=await fetcher(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(15000)})
  if(!response.ok)throw Error('NASA POWER upstream HTTP '+response.status)
  const payload=await response.json()
@@ -31,6 +34,7 @@ export async function retrievePower(q,{fetcher=fetch,now=Date.now()}={}){
  })
  const value={days,provenance:{provider:'NASA POWER',dataset:'Daily point',parameters:['PRECTOTCORR','ALLSKY_SFC_SW_DWN'],requestUrl:url,retrievedAt:new Date(now).toISOString()},quality:{etoAvailable:false,soilAvailable:false,sourceTemporalScale:'DAILY'}}
  if(cache.size>=100)cache.delete(cache.keys().next().value)
+ if(durable)await durable.set(key,value,TTL/1000)
  cache.set(url,{value,expires:now+TTL})
  return {...value,cache:'MISS'}
 }
