@@ -4,9 +4,11 @@ on:
     branches: [feature/predata-scientific-foundation]
   pull_request:
     paths:
-      - 'research/predata/**'
+      - 'research/**'
       - 'src/lib/predata-scientific-baselines.ts'
       - 'src/lib/water-intelligence-engine.ts'
+      - 'tests/**'
+      - 'api/**'
       - '.github/workflows/predata-scientific.yml'
 jobs:
   python-baselines:
@@ -23,7 +25,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
       - run: npm ci
       - run: npm run build
+      - run: node --experimental-strip-types --test tests/*.test.mjs
