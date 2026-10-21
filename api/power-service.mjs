@@ -19,20 +19,24 @@ export async function retrievePower(q,{fetcher=fetch,now=Date.now(),durable=crea
  const url=powerUrl(q)
  const cached=cache.get(url)
  if(cached&&cached.expires>now)return {...cached.value,cache:'HIT_EPHEMERAL'}
- const key=url
+ const key='units-v2:'+url
  if(durable){const shared=await durable.get(key);if(shared){cache.set(url,{value:shared,expires:now+TTL});return {...shared,cache:'HIT_DURABLE'}}}
  const response=await fetcher(url,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(15000)})
  if(!response.ok)throw Error('NASA POWER upstream HTTP '+response.status)
  const payload=await response.json()
+ const solarUnit=payload?.parameters?.ALLSKY_SFC_SW_DWN?.units
+ const rainUnit=payload?.parameters?.PRECTOTCORR?.units
+ const solarFactor=solarUnit==='MJ/m^2/day'?1/3.6:solarUnit==='kW-hr/m^2/day'?1:null
+ if(solarFactor===null||rainUnit!=='mm/day')throw Error('NASA POWER missing or unsupported units')
  const rain=payload?.properties?.parameter?.PRECTOTCORR
  const solar=payload?.properties?.parameter?.ALLSKY_SFC_SW_DWN
  if(!rain||!solar||!Object.keys(rain).length)throw Error('NASA POWER returned incomplete parameters')
  const days=Object.keys(rain).sort().map(d=>{
-  const precipitationMm=rain[d],irradiationKwhM2=solar[d]
+  const precipitationMm=rain[d],irradiationKwhM2=solar[d]*solarFactor
   if(!/^\d{8}$/.test(d)||![precipitationMm,irradiationKwhM2].every(x=>Number.isFinite(x)&&x>=0))throw Error('NASA POWER missing or invalid measurement')
   return {date:d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8),precipitationMm,irradiationKwhM2}
  })
- const value={days,provenance:{provider:'NASA POWER',dataset:'Daily point',parameters:['PRECTOTCORR','ALLSKY_SFC_SW_DWN'],requestUrl:url,retrievedAt:new Date(now).toISOString()},quality:{etoAvailable:false,soilAvailable:false,sourceTemporalScale:'DAILY'}}
+ const value={days,provenance:{provider:'NASA POWER',dataset:'Daily point',sourceUnits:{precipitation:rainUnit,solar:solarUnit},outputUnits:{precipitation:'mm/day',solar:'kWh/m2/day'},parameters:['PRECTOTCORR','ALLSKY_SFC_SW_DWN'],requestUrl:url,retrievedAt:new Date(now).toISOString()},quality:{etoAvailable:false,soilAvailable:false,sourceTemporalScale:'DAILY'}}
  if(cache.size>=100)cache.delete(cache.keys().next().value)
  if(durable)await durable.set(key,value,TTL/1000)
  cache.set(url,{value,expires:now+TTL})

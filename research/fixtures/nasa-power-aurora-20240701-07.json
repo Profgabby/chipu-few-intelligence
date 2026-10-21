@@ -1,0 +1,67 @@
+{
+  "requestUrl": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR%2CALLSKY_SFC_SW_DWN&community=AG&longitude=-122.75&latitude=45.28&start=20240701&end=20240707&format=JSON",
+  "retrievedAt": "2026-10-21T21:50:00.420Z",
+  "payload": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        -122.75,
+        45.28,
+        257.38
+      ]
+    },
+    "properties": {
+      "parameter": {
+        "PRECTOTCORR": {
+          "20240701": 0.15,
+          "20240702": 0.04,
+          "20240703": 0.03,
+          "20240704": 0.02,
+          "20240705": 0.02,
+          "20240706": 0.04,
+          "20240707": 0.02
+        },
+        "ALLSKY_SFC_SW_DWN": {
+          "20240701": 23.53,
+          "20240702": 28.19,
+          "20240703": 28.82,
+          "20240704": 31.11,
+          "20240705": 31.24,
+          "20240706": 31.47,
+          "20240707": 30.99
+        }
+      }
+    },
+    "header": {
+      "title": "NASA/POWER Source Native Resolution Daily Data",
+      "api": {
+        "version": "v2.10.1",
+        "name": "POWER Daily API"
+      },
+      "sources": [
+        "MERRA2",
+        "SYN1DEG"
+      ],
+      "fill_value": -999,
+      "time_standard": "LST",
+      "start": "20240701",
+      "end": "20240707"
+    },
+    "messages": [],
+    "parameters": {
+      "PRECTOTCORR": {
+        "units": "mm/day",
+        "longname": "Precipitation Corrected"
+      },
+      "ALLSKY_SFC_SW_DWN": {
+        "units": "MJ/m^2/day",
+        "longname": "All Sky Surface Shortwave Downward Irradiance"
+      }
+    },
+    "times": {
+      "data": 0.073,
+      "process": 0.01
+    }
+  }
+}
