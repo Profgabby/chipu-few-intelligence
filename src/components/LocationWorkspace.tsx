@@ -1,12 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useResearchContext } from '../lib/research-context'
 import { blankProfile, systemTypes, validateProfile, type PlaceProfile } from '../lib/place-profile'
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
 const countries = Array.from({length:26*26},(_,i)=>String.fromCharCode(65+Math.floor(i/26),65+i%26)).filter(code=>{const name=regionNames.of(code);return name && name!==code && !['ZZ','XA','XB','EU','UN','EZ'].includes(code)}).sort((a,b)=>(regionNames.of(a)||a).localeCompare(regionNames.of(b)||b))
+type Subdivision = {name:string;countryCode:string;isoCode:string}
+const subdivisionUrl='https://cdn.jsdelivr.net/npm/country-state-city@3.2.1/lib/assets/state.json'
+let subdivisionCache:Subdivision[]|null=null
 export function LocationWorkspace() {
   const { profile, saveProfile } = useResearchContext()
   const [draft, setDraft] = useState<PlaceProfile>(()=>profile.kind==='configured'?{...profile}:blankProfile(''))
   const [message,setMessage] = useState('')
+  const [subdivisions,setSubdivisions]=useState<Subdivision[]>(subdivisionCache??[])
+  const [subdivisionStatus,setSubdivisionStatus]=useState<'loading'|'ready'|'error'>(subdivisionCache?'ready':'loading')
+  useEffect(()=>{
+    if(subdivisionCache)return
+    const controller=new AbortController()
+    fetch(subdivisionUrl,{signal:controller.signal}).then(response=>{
+      if(!response.ok)throw Error('Subdivision dataset unavailable')
+      return response.json() as Promise<unknown>
+    }).then(data=>{
+      if(!Array.isArray(data)||!data.length||!data.every(item=>item&&typeof item.name==='string'&&typeof item.countryCode==='string'))throw Error('Invalid subdivision dataset')
+      subdivisionCache=data as Subdivision[]
+      setSubdivisions(subdivisionCache);setSubdivisionStatus('ready')
+    }).catch(()=>{if(!controller.signal.aborted)setSubdivisionStatus('error')})
+    return ()=>controller.abort()
+  },[])
+  const regionOptions=subdivisions.filter(s=>s.countryCode===draft.country).map(s=>s.name).sort((a,b)=>a.localeCompare(b))
+  const hasRegionOptions=regionOptions.length>0
   const field = (key: keyof PlaceProfile, label: string, type='text', placeholder='') => <label>{label}<input type={type} step={type==='number'?'any':undefined} value={draft[key]} placeholder={placeholder} onChange={e=>setDraft({...draft,[key]:e.target.value})}/></label>
   return <div className="workspace"><header className="console-heading"><div><div className="eyebrow">LIFEWS · GLOBAL RESEARCH CONTEXT</div><h1>Location & system</h1></div></header>
     <form onSubmit={e=>{e.preventDefault();const error=validateProfile(draft);if(error){setMessage(error);return}try{saveProfile({...draft,kind:'configured'});setMessage('Location and system saved. Active research context updated.')}catch{setMessage('Could not save this profile. Browser storage may be unavailable.')}}}>
@@ -14,7 +34,11 @@ export function LocationWorkspace() {
     <fieldset><legend>1 · Place and research site</legend><div className="place-fields">
       {field('name','Research site name')}
       <label>Country / territory<select value={draft.country} onChange={e=>setDraft({...draft,country:e.target.value,region:'',district:'',currency:e.target.value==='NG'?'NGN':e.target.value==='US'?'USD':'',timezone:e.target.value==='NG'?'Africa/Lagos':'UTC'})}><option value="">Choose location</option>{countries.map(c=><option key={c} value={c}>{regionNames.of(c)}</option>)}</select></label>
-      {field('region',draft.country==='US'||draft.country==='NG'?'State':'State / province / region')}{field('district',draft.country==='NG'?'Local Government Area (LGA)':'County / district / municipality')}
+      <label>{draft.country==='US'||draft.country==='NG'?'State':'State / province / region'}
+        {hasRegionOptions?<select value={regionOptions.includes(draft.region)?draft.region:''} onChange={e=>setDraft({...draft,region:e.target.value,district:''})} required><option value="">Choose state / province</option>{regionOptions.map((name,i)=><option key={name+'-'+i} value={name}>{name}</option>)}</select>
+        :subdivisionStatus==='loading'?<select disabled value=""><option value="">Loading states / provinces…</option></select>
+        :<><input value={draft.region} onChange={e=>setDraft({...draft,region:e.target.value})} placeholder="Enter state / province / region" required/><small>{subdivisionStatus==='error'?'State directory unavailable; manual entry is enabled.':'No listed subdivisions for this country; manual entry is enabled.'}</small></>}
+      </label>{field('district',draft.country==='NG'?'Local Government Area (LGA)':'County / district / municipality')}
       {field('latitude','Latitude (decimal degrees)','number')}{field('longitude','Longitude (decimal degrees)','number')}{field('elevation','Elevation (m)','number')}{field('timezone','Timezone','text','IANA timezone')}{field('currency','Currency code','text','Three-letter code')}
     </div></fieldset>
     <fieldset><legend>2 · System and experimental context</legend><div className="place-fields"><label>System type<select value={draft.systemType} onChange={e=>setDraft({...draft,systemType:e.target.value})}>{systemTypes.map(s=><option key={s}>{s}</option>)}</select></label>{field('zone','Parcel / zone name','text','Open sun A / Agrivoltaics B')}{field('experiment','Experiment reference (optional)')}{field('crop','Crop / cultivar (optional)')}<label>Scientific units<input readOnly value="SI · m, m², m³, °C, W, kWh"/></label></div></fieldset>

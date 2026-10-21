@@ -1,3 +1,4 @@
+import { measuredPumpEnergyKwh } from './predata-scientific-baselines'
 import { getTwinState, listTwinStates, type TwinStateEstimate } from './state-engine'
 import { listForecasts, type ForecastRun } from './forecast-engine'
 
@@ -70,9 +71,14 @@ export async function runWaterAnalysis(options: {
   const irrigationEfficiency = options.irrigationEfficiency ?? 0.90
   const areaM2 = options.areaM2 ?? 1000
 
-  const forecast24 = forecast?.points.find(p => p.leadHours === 24)
-  const cropWaterDemand = forecast24?.cropWaterDemand ?? 4.8
-  const effectivePrecipitation = forecast24?.forcing.precipitationMm ?? 0
+  if (!(Number.isFinite(targetWater) && targetWater >= 0 && targetWater <= 1 && Number.isFinite(irrigationEfficiency) && irrigationEfficiency > 0 && irrigationEfficiency <= 1 && Number.isFinite(areaM2) && areaM2 > 0)) throw new Error('Invalid water analysis settings: targetWater [0,1], efficiency (0,1], and positive area required.')
+
+  // Each forecast forcing record represents its own timestep; do not treat the
+  // lead-24 precipitation record as a cumulative 24-hour total.
+  const forecast24 = forecast?.points.filter(p => p.leadHours > 0 && p.leadHours <= 24) ?? []
+  const cropWaterDemand = forecast24.length > 0
+    ? forecast24.reduce((sum, p) => sum + p.cropWaterDemand, 0) : 4.8
+  const effectivePrecipitation = forecast24.reduce((sum, p) => sum + p.forcing.precipitationMm, 0)
   const waterDeficit = rootZoneWater === null ? null : Math.max(0, targetWater - rootZoneWater)
   const storageDepthMm = waterDeficit === null ? 0 : waterDeficit * 120
   const netIrrigationRequirement = Math.max(0, storageDepthMm + cropWaterDemand - effectivePrecipitation)
@@ -82,7 +88,7 @@ export async function runWaterAnalysis(options: {
     ? irrigationVolumeM3 * 1000 / pumpFlowLmin / 60
     : null
   const pumpingEnergyKwh = irrigationRuntimeHours !== null && pumpPowerKw !== null
-    ? irrigationRuntimeHours * pumpPowerKw
+    ? measuredPumpEnergyKwh(irrigationRuntimeHours, pumpPowerKw)
     : null
 
   const threshold = 0.24
@@ -96,6 +102,8 @@ export async function runWaterAnalysis(options: {
   if (pumpFlowLmin === null) warnings.push('No usable water-flow state is available; runtime cannot be calculated.')
   if (pumpPowerKw === null) warnings.push('No usable pump-power state is available; pumping energy cannot be calculated.')
   if (!forecast) warnings.push('No forecast initialized from this state was found; crop-water demand uses the demonstration fallback value.')
+  if (forecast && forecast.horizonHours < 24) warnings.push('Forecast horizon is shorter than 24 hours; water demand and precipitation cover only the available horizon.')
+  if (forecast?.forcingSource === 'DETERMINISTIC-DEMONSTRATION') warnings.push('Forecast uses generated weather forcing; irrigation results are not field prescriptions.')
 
   const status: WaterAnalysisResult['status'] = state.aggregateQuality === 'INSUFFICIENT'
     ? 'INSUFFICIENT'
