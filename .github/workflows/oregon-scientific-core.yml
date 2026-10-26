@@ -1,0 +1,36 @@
+name: Oregon Scientific Core
+on:
+  push:
+    branches: [feature/oregon-av-digital-twin-v01]
+    paths:
+      - 'scientific-core/oregon-av/**'
+      - '.github/workflows/oregon-scientific-core.yml'
+  workflow_dispatch:
+jobs:
+  scientific-baseline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: scientific-core/oregon-av
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate deterministic output
+        run: python -m chipu_oregon.baseline --output results/illustrative-baseline.json
+      - name: Check reproducibility
+        run: |
+          python -m chipu_oregon.baseline --output results/repeat.json > /dev/null
+          cmp results/illustrative-baseline.json results/repeat.json
+      - name: Upload illustrative output
+        uses: actions/upload-artifact@v4
+        with:
+          name: oregon-illustrative-baseline
+          path: scientific-core/oregon-av/results/illustrative-baseline.json
