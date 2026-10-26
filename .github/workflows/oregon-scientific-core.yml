@@ -23,6 +23,10 @@ jobs:
         run: |
           python -m pip install -e .
           python -m pip install -r requirements-science.txt
+      - name: Record environment versions
+        run: |
+          python --version
+          python -m pip freeze | sort | tee results-dependencies.txt
       - name: Unit tests
         run: python -m unittest discover -s tests -v
       - name: Generate deterministic output
@@ -31,8 +35,13 @@ jobs:
         run: |
           python -m chipu_oregon.baseline --output results/repeat.json > /dev/null
           cmp results/illustrative-baseline.json results/repeat.json
+      - name: SHA-256 evidence
+        run: sha256sum results/illustrative-baseline.json | tee results/illustrative-baseline.sha256
       - name: Upload illustrative output
         uses: actions/upload-artifact@v4
         with:
           name: oregon-illustrative-baseline
-          path: scientific-core/oregon-av/results/illustrative-baseline.json
+          path: |
+            scientific-core/oregon-av/results/illustrative-baseline.json
+            scientific-core/oregon-av/results/illustrative-baseline.sha256
+            scientific-core/oregon-av/results-dependencies.txt
