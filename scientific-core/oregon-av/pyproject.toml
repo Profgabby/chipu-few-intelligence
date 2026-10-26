@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chipu-oregon-av"
+version = "0.1.0"
+description = "Reproducible research baseline for the CHIPU-FEW Oregon agrivoltaic twin"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+chipu-oregon = "chipu_oregon.baseline:main"
