@@ -1,0 +1,4 @@
+# Optional scientific dependencies; pin exact resolved versions in an environment lock before publication.
+pvlib>=0.11,<1
+pandas>=2.0,<3
+numpy>=1.26,<3
