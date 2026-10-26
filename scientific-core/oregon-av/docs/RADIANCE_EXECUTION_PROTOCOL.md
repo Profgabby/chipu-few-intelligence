@@ -6,7 +6,7 @@ run has been executed or verified.** Do not call the geometry a measured
 Oregon installation.
 
 ## Illustrative fixed-tilt array
-WGS84 reference location 45.3 N, -122.75 E (a rounded regional reference,
+WGS84 reference location 45.3 N, 122.75 W (a rounded regional reference,
 not an instrument location). Tilt 25 degrees, south azimuth 180 degrees,
 module width 1.1 m, module length 2.0 m, lower clearance 1.5 m,
 row pitch 6.0 m, four modules per row, three rows, albedo 0.2.
