@@ -1,0 +1,66 @@
+name: Oregon Synthetic Radiance (isolated)
+on:
+  workflow_dispatch:
+    inputs:
+      epw_path:
+        description: 'Repository-relative path to a licensed EPW file on this branch'
+        required: true
+        default: 'scientific-core/oregon-av/weather/oregon-illustrative.epw'
+jobs:
+  synthetic-radiance:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: scientific-core/oregon-av
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Radiance and Python scientific packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y radiance
+          python -m pip install -e .
+          python -m pip install 'bifacial_radiance>=0.4,<1'
+          command -v oconv
+          command -v rtrace
+      - name: Record environment and source
+        run: |
+          mkdir -p results/radiance-synthetic
+          git rev-parse HEAD | tee results/radiance-synthetic/source-commit.txt
+          python --version 2>&1 | tee results/radiance-synthetic/python-version.txt
+          python -m pip freeze | sort | tee results/radiance-synthetic/dependencies.txt
+          (oconv -version || true) 2>&1 | tee results/radiance-synthetic/oconv-version.txt
+          (rtrace -version || true) 2>&1 | tee results/radiance-synthetic/rtrace-version.txt
+      - name: Verify EPW input exists
+        env:
+          EPW_PATH: ${{ inputs.epw_path }}
+        run: |
+          test -f "$GITHUB_WORKSPACE/$EPW_PATH" || {
+            echo "Missing EPW at repository-relative path: $EPW_PATH" >&2
+            echo "Provide a licensed EPW file on this feature branch, then rerun." >&2
+            exit 2
+          }
+          sha256sum "$GITHUB_WORKSPACE/$EPW_PATH" | tee results/radiance-synthetic/input-epw.sha256
+      - name: Run ray tracing and archive complete log
+        env:
+          EPW_PATH: ${{ inputs.epw_path }}
+        run: |
+          set -o pipefail
+          python -m chipu_oregon.radiance_synthetic \
+            --epw "$GITHUB_WORKSPACE/$EPW_PATH" \
+            --output results/radiance-synthetic 2>&1 | tee results/radiance-synthetic/execution.log
+      - name: Hash outputs
+        if: always()
+        run: |
+          find results/radiance-synthetic -type f -print0 | sort -z | xargs -0 -r sha256sum > results/radiance-synthetic/output-sha256.txt
+      - name: Upload evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oregon-synthetic-radiance-evidence
+          path: scientific-core/oregon-av/results/radiance-synthetic/
+          if-no-files-found: warn
