@@ -1,3 +1,4 @@
+import { OregonDigitalTwinPreview } from './components/OregonDigitalTwinPreview'
 import { AVModelLaboratoryWorkspace } from './components/AVModelLaboratoryWorkspace'
 import { LocationWorkspace } from './components/LocationWorkspace'
 import { Navigate, Route, Routes } from 'react-router-dom'
@@ -31,6 +32,7 @@ export default function App() {
     <Route path="/" element={<Navigate to="/app" replace/>}/>
     <Route path="/overview" element={<Navigate to="/app" replace/>}/>
     <Route element={<AppLayout/>}>
+      <Route path="/oregon-digital-twin" element={<OregonDigitalTwinPreview/>}/>
       <Route path="/app/location" element={<LocationWorkspace/>}/>
       <Route path="/app" element={<ChipuOverviewWorkspace/>}/>
       <Route path="/app/model-laboratory" element={<AVModelLaboratoryWorkspace/>}/>
