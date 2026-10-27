@@ -27,8 +27,10 @@ class TestWeatherIngestion(unittest.TestCase):
     def test_out_of_bounds_fails(self):
         d=self.fixture()
         d["properties"]["parameter"]["RH2M"]["20240229"]=130
-        with self.assertRaises(ValueError):
-            process(json.dumps(d).encode(),2024)
+        report=process(json.dumps(d).encode(),2024)
+        self.assertEqual(report["status"],"review_required")
+        self.assertEqual(report["quality_flags"][0]["date"],"20240229")
+        self.assertEqual(report["quality_flags"][0]["parameter"],"RH2M")
     def test_url_has_source_coordinates(self):
         url=request_url(44.63,-121.13,2024)
         self.assertIn("latitude=44.63",url)
