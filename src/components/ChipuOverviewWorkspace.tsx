@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, ArrowRight, BrainCircuit, CircleAlert, Droplets, Gauge, RefreshCw, Sprout, Sun } from 'lucide-react'
+import { Activity, ArrowRight, BrainCircuit, CircleAlert, Droplets, Gauge, MapPinned, RefreshCw, Sprout, Sun } from 'lucide-react'
 import { getZone } from '../lib/cropsmart-model'
 import { loadCommandCenterState, stateComponent, type CommandCenterState } from '../lib/command-center-engine'
 import { useResearchContext } from '../lib/research-context'
@@ -38,6 +38,8 @@ export function ChipuOverviewWorkspace() {
       <Link className="button button-primary" to="/app/location">{profile.kind==='unconfigured'?'Choose location & system':'Manage location & system'}</Link>
       {hasEvidenceContext&&<button className="console-refresh" onClick={()=>void refresh()} disabled={busy}><RefreshCw size={16} className={busy?'spin':''}/>{busy?'Refreshing':'Refresh'}</button>}
     </header>
+
+    <section aria-label="Oregon research workspace" style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:18,flexWrap:"wrap",background:"#edf6f0",border:"1px solid #c6ddcf",borderRadius:12,padding:"18px 22px",margin:"20px 0"}}><div><span className="eyebrow">DEDICATED RESEARCH WORKSPACE</span><h2 style={{margin:"6px 0",fontSize:20}}>Oregon Agrivoltaic Digital Twin</h2><p style={{margin:0,fontSize:12,color:"#587466"}}>Explore proposed Oregon system geometry, FEW model readiness and scientific verification in a separate workspace.</p></div><Link className="button button-primary" to="/oregon-digital-twin"><MapPinned size={16}/>Open Oregon Digital Twin<ArrowRight size={16}/></Link></section>
 
     <section className="overview-summary" aria-label="Active research context">
       <div><span>{hasEvidenceContext?'DISPLAYED DATASET':'ACTIVE CONTEXT'}</span><strong>{profile.kind==='unconfigured'?'Choose your study location':(hasEvidenceContext?'CHIPU-FEW simulation example':profile.name)}</strong><small>{profile.kind==='unconfigured'?'Choose a location to connect site evidence':[profile.country,profile.region,zoneId].filter(Boolean).join(' · ')}</small></div>
