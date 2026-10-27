@@ -1,0 +1,47 @@
+{
+  "status": "stations_identified_historical_data_not_yet_downloaded",
+  "provider": "US Bureau of Reclamation AgriMet",
+  "historical_archive_url": "https://www.usbr.gov/pn/agrimet/webarcread.html",
+  "parameter_reference_url": "https://www.usbr.gov/pn/agrimet/aginfo/archive_pcodes.html",
+  "year": 2024,
+  "stations": [
+    {
+      "region": "central_oregon_madras",
+      "station_id": "MRSO",
+      "name": "Madras AgriMet",
+      "latitude": 44.68,
+      "longitude": -121.14861,
+      "station_url": "https://www.usbr.gov/pn/agrimet/agrimetmap/mrsoda.html"
+    },
+    {
+      "region": "willamette_aurora",
+      "station_id": "ARAO",
+      "name": "Aurora AgriMet",
+      "latitude": 45.28194,
+      "longitude": -122.75027,
+      "station_url": "https://www.usbr.gov/pn/agrimet/agrimetmap/araoda.html"
+    }
+  ],
+  "requested_daily_parameters": {
+    "MM": "mean air temperature Fahrenheit",
+    "MN": "minimum air temperature Fahrenheit",
+    "MX": "maximum air temperature Fahrenheit",
+    "PP": "daily precipitation inches",
+    "SR": "global solar radiation langleys",
+    "TA": "relative humidity percent",
+    "UA": "wind speed mph",
+    "ETOS": "ASCE grass reference ET inches; comparison only, not FAO56 validation"
+  },
+  "conversion_constants": {
+    "fahrenheit_to_celsius": "(F-32)*5/9",
+    "inches_to_mm": 25.4,
+    "mph_to_mps": 0.44704,
+    "langleys_to_kwh_m2": 0.0116222222222
+  },
+  "cautions": [
+    "AgriMet historical archive data must be obtained and raw files checksummed before comparison.",
+    "Inspect station instrumentation, observation flags, missing values and time conventions.",
+    "Daily global radiation does not provide hourly DNI and DHI.",
+    "ETOS is ASCE-EWRI grass reference ET and should not be conflated with independently calculated FAO-56 ET0."
+  ]
+}
