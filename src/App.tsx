@@ -31,8 +31,8 @@ export default function App() {
   return <><ToastBridge/><Routes>
     <Route path="/" element={<Navigate to="/app" replace/>}/>
     <Route path="/overview" element={<Navigate to="/app" replace/>}/>
+    <Route path="/oregon-digital-twin" element={<OregonDigitalTwinPreview/>}/>
     <Route element={<AppLayout/>}>
-      <Route path="/oregon-digital-twin" element={<OregonDigitalTwinPreview/>}/>
       <Route path="/app/location" element={<LocationWorkspace/>}/>
       <Route path="/app" element={<ChipuOverviewWorkspace/>}/>
       <Route path="/app/model-laboratory" element={<AVModelLaboratoryWorkspace/>}/>
