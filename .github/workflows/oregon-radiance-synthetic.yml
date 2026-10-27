@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       epw_path:
-        description: 'Repository-relative path to a licensed EPW file on this branch'
+        description: 'Repository-relative EPW path, or synthetic for deterministic smoke test'
         required: true
-        default: 'scientific-core/oregon-av/weather/oregon-illustrative.epw'
+        default: 'synthetic'
 jobs:
   synthetic-radiance:
     runs-on: ubuntu-22.04
@@ -39,6 +39,11 @@ jobs:
         env:
           EPW_PATH: ${{ inputs.epw_path }}
         run: |
+          if [ "$EPW_PATH" = "synthetic" ]; then
+            python -m chipu_oregon.synthetic_epw --output results/radiance-synthetic/synthetic-smoke.epw
+            EPW_PATH="scientific-core/oregon-av/results/radiance-synthetic/synthetic-smoke.epw"
+          fi
+          echo "RESOLVED_EPW=$GITHUB_WORKSPACE/$EPW_PATH" >> "$GITHUB_ENV"
           test -f "$GITHUB_WORKSPACE/$EPW_PATH" || {
             echo "Missing EPW at repository-relative path: $EPW_PATH" >&2
             echo "Provide a licensed EPW file on this feature branch, then rerun." >&2
