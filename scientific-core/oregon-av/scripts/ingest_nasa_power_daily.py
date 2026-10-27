@@ -6,6 +6,7 @@ This script makes real HTTPS requests; no fallback or synthetic substitutions.
 import argparse
 import hashlib
 import json
+import math
 from datetime import date, timedelta, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
@@ -30,21 +31,23 @@ def process(raw, year):
     series = data["properties"]["parameter"]
     expected = [(date(year, 1, 1) + timedelta(days=i)).strftime("%Y%m%d") for i in range((date(year+1,1,1)-date(year,1,1)).days)]
     result = {}
+    flags = []
     for key in PARAMETERS:
         values = series[key]
         if set(values) != set(expected):
             raise ValueError(f"{key}: date coverage mismatch ({len(values)} vs {len(expected)})")
-        missing = sum(v is None or not isinstance(v,(int,float)) or v <= -900 for v in values.values())
-        valid = [v for v in values.values() if isinstance(v,(int,float)) and v > -900]
+        missing = sum(v is None or not isinstance(v,(int,float)) or not math.isfinite(v) or v <= -900 for v in values.values())
+        valid = [v for v in values.values() if isinstance(v,(int,float)) and math.isfinite(v) and v > -900]
         bounds = {"RH2M": (0,100), "PRECTOTCORR": (0,1000), "WS2M": (0,100), "ALLSKY_SFC_SW_DWN": (0,20), "T2M": (-90,65), "T2M_MAX": (-90,65), "T2M_MIN": (-90,65)}
         low, high = bounds[key]
-        out_of_range = sum(not low <= v <= high for v in valid)
+        outliers = [{"date": day, "value": value, "bounds": [low, high]} for day, value in values.items() if isinstance(value, (int,float)) and math.isfinite(value) and value > -900 and not low <= value <= high]
+        out_of_range = len(outliers)
+        flags.extend({"parameter": key, **item} for item in outliers)
         result[key] = {"unit": UNITS[key], "total_days": len(expected), "missing_days": missing,
                        "out_of_range_days": out_of_range, "min": min(valid) if valid else None,
                        "max": max(valid) if valid else None}
-    if any(v["out_of_range_days"] for v in result.values()):
-        raise ValueError("Physically implausible values detected")
-    return {"header": data.get("header", {}), "parameters": result, "days": len(expected)}
+    return {"header": data.get("header", {}), "parameters": result, "days": len(expected),
+            "quality_flags": flags, "status": "review_required" if flags or any(v["missing_days"] for v in result.values()) else "preliminary_qc_pass_not_model_approved"}
 
 def run(outdir, year):
     outdir.mkdir(parents=True, exist_ok=True)
@@ -54,14 +57,18 @@ def run(outdir, year):
         url = request_url(lat,lon,year)
         with urlopen(Request(url, headers={"User-Agent": "CHIPU-FEW-Oregon-Research/0.1"}), timeout=90) as response:
             raw = response.read()
-        summary = process(raw, year)
         name = f"{site}_{year}_nasa_power_raw.json"
         (outdir/name).write_bytes(raw)
+        try:
+            summary = process(raw, year)
+        except Exception as exc:
+            summary = {"status": "processing_error", "error": str(exc), "quality_flags": []}
         manifest["locations"][site] = {"requested_latitude": lat, "requested_longitude": lon,
           "request_url": url, "raw_file": name, "sha256": hashlib.sha256(raw).hexdigest(), "qc": summary}
     (outdir/"manifest.json").write_text(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
-    print(json.dumps({k: {"sha256":v["sha256"], "days":v["qc"]["days"],
-        "missing": {p:d["missing_days"] for p,d in v["qc"]["parameters"].items()}}
+    print(json.dumps({k: {"sha256":v["sha256"], "status":v["qc"]["status"],
+        "flags":v["qc"].get("quality_flags", [])[:20],
+        "flag_count":len(v["qc"].get("quality_flags", []))}
         for k,v in manifest["locations"].items()},indent=2))
 
 if __name__ == "__main__":
