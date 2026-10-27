@@ -56,17 +56,20 @@ jobs:
           bins = list(root.rglob("oconv"))
           if not bins:
               raise RuntimeError("Downloaded Radiance archive does not contain oconv")
+          for binary in bins[0].parent.iterdir():
+              if binary.is_file():
+                  binary.chmod(binary.stat().st_mode | 0o111)
           bindir = bins[0].parent
           print("Radiance binary directory:", bindir.resolve(), flush=True)
-          os.environ["GITHUB_PATH"] and pathlib.Path(os.environ["GITHUB_PATH"]).open("a").write(str(bindir.resolve()) + "\\n")
+          os.environ["GITHUB_PATH"] and pathlib.Path(os.environ["GITHUB_PATH"]).open("a").write(str(bindir.resolve()) + "\n")
           libs = list(root.rglob("ray/lib"))
           if libs:
               with pathlib.Path(os.environ["GITHUB_ENV"]).open("a") as f:
-                  f.write("RAYPATH=.:" + str(libs[0].resolve()) + "\\n")
+                  f.write("RAYPATH=.:" + str(libs[0].resolve()) + "\n")
           with pathlib.Path(os.environ["GITHUB_ENV"]).open("a") as f:
-              f.write("RADIANCE_RELEASE=" + release["tag_name"] + "\\n")
+              f.write("RADIANCE_RELEASE=" + release["tag_name"] + "\n")
           PY
-          export PATH="$(find results/radiance-synthetic/radiance-install -type f -name oconv -printf '%h\\n' | head -1):$PATH"
+          export PATH="$(find results/radiance-synthetic/radiance-install -type f -name oconv -printf '%h' -quit):$PATH"
           python -m pip install -e . 2>&1 | tee results/radiance-synthetic/pip-project.log
           python -m pip install 'bifacial_radiance>=0.4,<1' 2>&1 | tee results/radiance-synthetic/pip-radiance.log
           command -v oconv
