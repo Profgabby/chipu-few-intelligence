@@ -31,7 +31,7 @@ jobs:
         run: |
           set -o pipefail
           python - <<'PY' 2>&1 | tee results/radiance-synthetic/radiance-download.log
-          import json, os, pathlib, urllib.request, zipfile
+          import json, os, pathlib, tarfile, urllib.request, zipfile
           api = "https://api.github.com/repos/LBNL-ETA/Radiance/releases?per_page=10"
           req = urllib.request.Request(api, headers={"User-Agent": "oregon-av-ci", "Accept": "application/vnd.github+json"})
           releases = json.load(urllib.request.urlopen(req, timeout=45))
@@ -53,6 +53,16 @@ jobs:
                   if p.is_absolute() or ".." in p.parts:
                       raise RuntimeError("Unsafe zip entry: " + entry.filename)
               z.extractall(root)
+          archives = list(root.rglob("*Linux.tar.gz"))
+          if not archives:
+              raise RuntimeError("Radiance Linux ZIP lacks the expected Linux tar.gz installer")
+          with tarfile.open(archives[0], "r:gz") as tar:
+              members = tar.getmembers()
+              for member in members:
+                  p = pathlib.PurePosixPath(member.name)
+                  if p.is_absolute() or ".." in p.parts or member.issym() or member.islnk():
+                      raise RuntimeError("Unsafe tar entry: " + member.name)
+              tar.extractall(root, members=members, filter="data")
           bins = list(root.rglob("oconv"))
           if not bins:
               raise RuntimeError("Downloaded Radiance archive does not contain oconv")
@@ -62,7 +72,7 @@ jobs:
           bindir = bins[0].parent
           print("Radiance binary directory:", bindir.resolve(), flush=True)
           os.environ["GITHUB_PATH"] and pathlib.Path(os.environ["GITHUB_PATH"]).open("a").write(str(bindir.resolve()) + "\n")
-          libs = list(root.rglob("ray/lib"))
+          libs = list(root.rglob("radiance/lib"))
           if libs:
               with pathlib.Path(os.environ["GITHUB_ENV"]).open("a") as f:
                   f.write("RAYPATH=.:" + str(libs[0].resolve()) + "\n")
