@@ -1,4 +1,5 @@
 name: Oregon real meteorological data ingestion
+# diagnostic rerun: use updated QC contract tests and preserve source artifacts
 
 on:
   workflow_dispatch:
