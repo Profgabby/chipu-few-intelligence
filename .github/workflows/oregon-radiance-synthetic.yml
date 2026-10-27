@@ -30,12 +30,48 @@ jobs:
       - name: Install Radiance and Python scientific packages
         run: |
           set -o pipefail
-          sudo apt-get update 2>&1 | tee results/radiance-synthetic/apt-update.log
-          sudo apt-get install -y radiance 2>&1 | tee results/radiance-synthetic/apt-install.log
+          python - <<'PY' 2>&1 | tee results/radiance-synthetic/radiance-download.log
+          import json, os, pathlib, urllib.request, zipfile
+          api = "https://api.github.com/repos/LBNL-ETA/Radiance/releases?per_page=10"
+          req = urllib.request.Request(api, headers={"User-Agent": "oregon-av-ci", "Accept": "application/vnd.github+json"})
+          releases = json.load(urllib.request.urlopen(req, timeout=45))
+          choices = [(r, a) for r in releases for a in r.get("assets", [])
+                     if a["name"].endswith("_Linux.zip")]
+          if not choices:
+              raise RuntimeError("No Linux zip found in the 10 latest official LBNL-ETA/Radiance releases")
+          release, asset = choices[0]
+          dest = pathlib.Path("results/radiance-synthetic/radiance-release.zip")
+          print("Radiance release:", release["tag_name"], "asset:", asset["name"], "url:", asset["browser_download_url"], flush=True)
+          urllib.request.urlretrieve(asset["browser_download_url"], dest)
+          import hashlib
+          print("Radiance archive SHA256:", hashlib.sha256(dest.read_bytes()).hexdigest(), flush=True)
+          root = pathlib.Path("results/radiance-synthetic/radiance-install")
+          root.mkdir(parents=True, exist_ok=True)
+          with zipfile.ZipFile(dest) as z:
+              for entry in z.infolist():
+                  p = pathlib.PurePosixPath(entry.filename)
+                  if p.is_absolute() or ".." in p.parts:
+                      raise RuntimeError("Unsafe zip entry: " + entry.filename)
+              z.extractall(root)
+          bins = list(root.rglob("oconv"))
+          if not bins:
+              raise RuntimeError("Downloaded Radiance archive does not contain oconv")
+          bindir = bins[0].parent
+          print("Radiance binary directory:", bindir.resolve(), flush=True)
+          os.environ["GITHUB_PATH"] and pathlib.Path(os.environ["GITHUB_PATH"]).open("a").write(str(bindir.resolve()) + "\\n")
+          libs = list(root.rglob("ray/lib"))
+          if libs:
+              with pathlib.Path(os.environ["GITHUB_ENV"]).open("a") as f:
+                  f.write("RAYPATH=.:" + str(libs[0].resolve()) + "\\n")
+          with pathlib.Path(os.environ["GITHUB_ENV"]).open("a") as f:
+              f.write("RADIANCE_RELEASE=" + release["tag_name"] + "\\n")
+          PY
+          export PATH="$(find results/radiance-synthetic/radiance-install -type f -name oconv -printf '%h\\n' | head -1):$PATH"
           python -m pip install -e . 2>&1 | tee results/radiance-synthetic/pip-project.log
           python -m pip install 'bifacial_radiance>=0.4,<1' 2>&1 | tee results/radiance-synthetic/pip-radiance.log
           command -v oconv
           command -v rtrace
+          command -v gencumulativesky || true
       - name: Record environment and source
         run: |
           mkdir -p results/radiance-synthetic
