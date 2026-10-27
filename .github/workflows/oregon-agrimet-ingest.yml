@@ -1,0 +1,43 @@
+name: Oregon AgriMet historical station acquisition
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/oregon-av-digital-twin-v01
+    paths:
+      - 'scientific-core/oregon-av/scripts/ingest_agrimet_2024.py'
+      - '.github/workflows/oregon-agrimet-ingest.yml'
+permissions:
+  contents: read
+jobs:
+  station-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve original station archive files
+        run: python scientific-core/oregon-av/scripts/ingest_agrimet_2024.py --year 2024 --outdir results/oregon-agrimet
+      - name: Independently verify downloaded file hashes
+        run: |
+          python - <<'PY'
+          import hashlib,json,pathlib
+          root=pathlib.Path("results/oregon-agrimet")
+          manifest=json.loads((root/"agrimet_manifest.json").read_text())
+          assert set(manifest["stations"])=={"central_oregon_madras","willamette_aurora"}
+          for record in manifest["stations"].values():
+              raw=(root/record["raw_file"]).read_bytes()
+              assert hashlib.sha256(raw).hexdigest()==record["sha256"]
+              assert b"BEGIN DATA" in raw and b"END DATA" in raw
+          print("Both station raw downloads match manifest SHA256")
+          PY
+      - name: Archive original observations and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oregon-agrimet-2024-original
+          path: results/oregon-agrimet/
+          if-no-files-found: warn
+          retention-days: 90
