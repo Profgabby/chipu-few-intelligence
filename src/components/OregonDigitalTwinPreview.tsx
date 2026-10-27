@@ -2,54 +2,78 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './OregonDigitalTwinPreview.css'
 
-const geometry = [
-  ['Location', 'Oregon illustrative site'], ['Latitude / longitude', '45.30° N · 122.75° W'],
-  ['Modules', '3 rows × 4 modules'], ['Module dimensions', '1.10 × 2.00 m'],
-  ['Tilt / azimuth', '25° / 180°'], ['Row pitch', '6.00 m'],
-  ['Module clearance', '1.50 m'], ['Ground albedo', '0.20'],
+type Section = 'overview'|'design'|'simulation'|'analysis'|'evidence'
+const sections: {key:Section;name:string}[] = [
+  {key:'overview',name:'Overview'},{key:'design',name:'System design'},
+  {key:'simulation',name:'Simulation'},{key:'analysis',name:'FEW analysis'},
+  {key:'evidence',name:'Evidence'}
 ]
-const gates = [
-  {name:'FAO-56 reference equation',state:'Implemented',detail:'Published reference test exists; current-revision CI verification pending'},
-  {name:'Synthetic weather fixture',state:'Illustrative',detail:'8,760-hour generated EPW, not observed Oregon weather'},
-  {name:'Array and ground geometry',state:'Illustrative',detail:'Proposed layout, not surveyed or field calibrated'},
-  {name:'Radiance ray tracing',state:'Pending',detail:'Numerical run and irradiance output not independently verified'},
-  {name:'Ground-sensor convergence',state:'Pending',detail:'31 vs 61 sensor convergence and open-field control required'},
-  {name:'Field validation',state:'Pending',detail:'No measured crop, soil, PV or irrigation comparison available'},
+const inputs = [
+  ['Study area','Oregon · illustrative'],
+  ['Configuration','Fixed tilt · 3 × 4 modules'],
+  ['Tilt / orientation','25° · 180°'],
+  ['Pitch / clearance','6.00 m · 1.50 m'],
+  ['Module size','1.10 × 2.00 m'],
+  ['Surface albedo','0.20'],
+  ['Weather source','Synthetic EPW fixture']
 ]
-type Tab = 'overview' | 'geometry' | 'evidence'
-export function OregonDigitalTwinPreview() {
-  const [tab,setTab] = useState<Tab>('overview')
+const checks = [
+  ['Reference evapotranspiration','FAO-56 published-example test implemented','Latest revision not verified in CI'],
+  ['Radiation engine','bifacial_radiance integration prepared','Actual ray-tracing outputs unverified'],
+  ['Weather forcing','Deterministic 8,760-hour EPW generator','Synthetic; not observed Oregon weather'],
+  ['Ground irradiance','31-sensor configuration specified','Convergence and open-field comparison pending'],
+  ['Field comparison','No measured observations connected','Empirical validation not started'],
+]
+function ArrayDiagram({view}:{view:'plan'|'elevation'}) {
+  return <svg className="odt-array" viewBox="0 0 720 325" role="img" aria-label={view==='plan'?'Conceptual overhead plan of three rows of four modules':'Conceptual elevation of agrivoltaic modules over crops'}>
+    <rect width="720" height="325" fill="#f1f3ef"/>
+    {view==='plan'?<>
+      {Array.from({length:3},(_,row)=>Array.from({length:4},(_,col)=><g key={row+'-'+col}>
+        <rect x={45+col*165} y={35+row*91} width="138" height="52" rx="2" fill="#234c46" stroke="#b4c8bc" strokeWidth="2"/>
+        <path d={`M${114+col*165} ${37+row*91}v48 M${47+col*165} ${61+row*91}h134`} stroke="#638a7c" strokeWidth="1.5"/>
+      </g>))}
+      <path d="M45 305H675" stroke="#81998b" strokeWidth="1" strokeDasharray="4 6"/>
+      <text x="45" y="318" fill="#62776c" fontSize="11">PLAN VIEW  /  3 ROWS × 4 MODULES  /  NOT TO SCALE</text>
+    </>:<>
+      <path d="M28 259H692" stroke="#7b9584" strokeWidth="2"/>
+      {Array.from({length:3},(_,i)=><g key={i}>
+        <path d={`M${80+i*220} 161l140 -47l8 20l-140 47z`} fill="#234c46" stroke="#779b8c" strokeWidth="2"/>
+        <path d={`M${95+i*220} 180v79 M${205+i*220} 142v117`} stroke="#6b7e73" strokeWidth="5"/>
+        {Array.from({length:4},(_,j)=><path key={j} d={`M${95+i*220+j*30} 259q-8 -24 -14 -22m14 22q8 -23 16 -21`} fill="none" stroke="#6d9d6b" strokeWidth="2"/>)}
+      </g>)}
+      <text x="35" y="302" fill="#62776c" fontSize="11">ELEVATION STUDY  /  SCHEMATIC ONLY  /  NOT TO SCALE</text>
+    </>}
+  </svg>
+}
+function Output({name,detail}:{name:string;detail:string}) {
+  return <div className="odt-output"><span>{name}</span><strong>—</strong><small>{detail}</small></div>
+}
+export function OregonDigitalTwinPreview(){
+  const [section,setSection]=useState<Section>('overview')
+  const [view,setView]=useState<'plan'|'elevation'>('plan')
   return <div className="odt-shell">
     <header className="odt-topbar">
-      <Link to="/oregon-digital-twin" className="odt-brand"><span className="odt-mark">O</span><span><strong>OREGON DIGITAL TWIN</strong><small>Agrivoltaic FEW research · v0.1</small></span></Link>
-      <div className="odt-top-actions"><span className="odt-preview-tag">ISOLATED RESEARCH PREVIEW</span><Link className="odt-return" to="/app">← Return to CHIPU-FEW</Link></div>
+      <div className="odt-brand"><span className="odt-mark">CF</span><span><strong>CHIPU-FEW <em>/</em> OREGON</strong><small>Scientific digital twin · Research preview 0.1</small></span></div>
+      <div className="odt-top-actions"><span className="odt-preview-tag">ISOLATED WORKSPACE</span><Link className="odt-return" to="/app">← Main platform</Link></div>
     </header>
-    <main className="odt-main">
-      <div className="odt-intro"><div><div className="odt-kicker">OREGON · SCIENTIFIC MODEL WORKSPACE</div><h1>Agrivoltaic Digital Twin</h1><p>Explore proposed system geometry, food–energy–water model readiness, and reproducible scientific evidence in a dedicated Oregon workspace.</p></div><div className="odt-state"><span className="odt-status-dot"/><div><strong>Verification pending</strong><small>Research outputs are not validated</small></div></div></div>
-      <nav className="odt-tabs" aria-label="Oregon digital twin sections">{([['overview','Research overview'],['geometry','System & geometry'],['evidence','Evidence & methods']] as const).map(([key,label])=><button key={key} className={tab===key?'odt-tab odt-tab-active':'odt-tab'} onClick={()=>setTab(key)} aria-current={tab===key?'page':undefined}>{label}</button>)}</nav>
-      <div className="odt-notice"><strong>Illustrative research environment.</strong> This preview contains proposed geometry and software-readiness information, not live sensor measurements or validated Radiance, crop, energy or irrigation results.</div>
-      {tab==='overview'&&<>
-        <section className="odt-kpis" aria-label="Food energy water readiness">
-          {[
-            ['FOOD','Crop and soil response','Awaiting data','No measured yield or soil-water series'],
-            ['ENERGY','PV and irradiance','Awaiting simulation','Radiance numerical verification pending'],
-            ['WATER','ET₀ and irrigation','Awaiting model run','FAO-56 reference ≠ site forecast'],
-            ['RESEARCH','Scientific release gate','Not approved','Independent verification required'],
-          ].map(([label,title,value,note])=><article className="odt-kpi" key={label}><div className="odt-kpi-label">{label}</div><h3>{title}</h3><strong>{value}</strong><p>{note}</p></article>)}
-        </section>
-        <section className="odt-grid">
-          <article className="odt-panel odt-panel-wide"><div className="odt-panel-head"><div><span className="odt-eyebrow">SYSTEM CONCEPT</span><h2>Proposed agrivoltaic array</h2></div><button className="odt-text-button" onClick={()=>setTab('geometry')}>Explore geometry →</button></div><div className="odt-panel-body">
-            <svg className="odt-array" viewBox="0 0 640 250" role="img" aria-label="Illustrative overhead schematic with three rows of four solar modules, not to scale">
-              <rect x="0" y="0" width="640" height="250" rx="12" fill="#edf4ee"/>
-              {Array.from({length:3},(_,row)=>Array.from({length:4},(_,col)=><g key={row+'-'+col}><rect x={46+col*145} y={26+row*76} width="116" height="45" rx="4" fill="#195b4c" stroke="#b6d5c3" strokeWidth="2"/><path d={`M${104+col*145} ${28+row*76}v41 M${48+col*145} ${48+row*76}h112`} stroke="#659d8a" strokeWidth="1.5"/></g>))}
-            </svg><div className="odt-schematic-caption">12-module conceptual plan · 3 rows · not to scale · not a Radiance output</div>
-          </div></article>
-          <article className="odt-panel"><div className="odt-panel-head"><div><span className="odt-eyebrow">RESEARCH INTEGRITY</span><h2>Scientific readiness</h2></div></div><div className="odt-panel-body"><div className="odt-readiness"><span>Implementation</span><strong>In progress</strong></div><div className="odt-readiness"><span>Numerical verification</span><strong>Pending</strong></div><div className="odt-readiness"><span>Empirical validation</span><strong>Pending</strong></div><button className="odt-text-button" onClick={()=>setTab('evidence')}>View verification gates →</button></div></article>
-        </section>
-      </>}
-      {tab==='geometry'&&<section className="odt-panel"><div className="odt-panel-head"><div><span className="odt-eyebrow">SIMULATION INPUTS</span><h2>Geometry and forcing assumptions</h2></div></div><div className="odt-panel-body"><div className="odt-details">{geometry.map(([name,value])=><div key={name}><span>{name}</span><strong>{value}</strong></div>)}</div><p className="odt-footnote">These are synthetic configuration values from the research prototype, not measurements from a surveyed installation. Weather forcing is a deterministic smoke-test fixture and must not be interpreted as observed meteorology.</p></div></section>}
-      {tab==='evidence'&&<section className="odt-panel"><div className="odt-panel-head"><div><span className="odt-eyebrow">PROVENANCE & VALIDATION</span><h2>Scientific verification register</h2></div></div><div className="odt-panel-body"><div className="odt-gates">{gates.map(g=><div className="odt-gate" key={g.name}><div><strong>{g.name}</strong><p>{g.detail}</p></div><span>{g.state}</span></div>)}</div><a className="odt-source" href="https://github.com/Profgabby/chipu-few-intelligence/tree/feature/oregon-av-digital-twin-v01/scientific-core/oregon-av" target="_blank" rel="noreferrer">Review source code and research documentation ↗</a></div></section>}
-      <footer className="odt-footer"><span>CHIPU-FEW Intelligence · Oregon research preview · No validated results displayed</span><Link to="/app">Return to main platform →</Link></footer>
-    </main>
+    <div className="odt-body">
+      <aside className="odt-rail">
+        <div className="odt-rail-title">RESEARCH WORKBENCH</div>
+        <nav aria-label="Oregon workbench">{sections.map((s,i)=><button key={s.key} className={section===s.key?'odt-rail-item odt-rail-active':'odt-rail-item'} onClick={()=>setSection(s.key)}><span>{String(i+1).padStart(2,'0')}</span>{s.name}</button>)}</nav>
+        <div className="odt-rail-note"><strong>Scientific release</strong><span>Not yet verified</span><p>Results are withheld until execution and numerical checks pass.</p></div>
+      </aside>
+      <main className="odt-main">
+        <div className="odt-heading"><div><span className="odt-kicker">OREGON RESEARCH / {section.toUpperCase()}</span><h1>{section==='overview'?'Agrivoltaic system workbench':sections.find(s=>s.key===section)?.name}</h1><p>Fixed-tilt agrivoltaics · Food–energy–water coupling · Illustrative Oregon configuration</p></div><span className="odt-state">RESEARCH PREVIEW <b>·</b> UNVERIFIED</span></div>
+        <div className="odt-inline-note"><strong>Evidence classification:</strong> The geometry and weather fixture are illustrative. No site observations or independently verified Radiance outputs are represented here.</div>
+        {(section==='overview'||section==='design')&&<div className="odt-workgrid">
+          <section className="odt-panel odt-input-panel"><div className="odt-panel-heading"><span>01 / MODEL CONFIGURATION</span><h2>System definition</h2></div><div className="odt-inputs">{inputs.map(([k,v])=><div key={k}><span>{k}</span><strong>{v}</strong></div>)}</div><div className="odt-input-footer">Read-only reference geometry · Not field surveyed</div></section>
+          <section className="odt-panel odt-visual-panel"><div className="odt-panel-heading odt-visual-heading"><div><span>02 / ARRAY GEOMETRY</span><h2>Physical system</h2></div><div className="odt-view-switch"><button className={view==='plan'?'selected':''} onClick={()=>setView('plan')}>Plan</button><button className={view==='elevation'?'selected':''} onClick={()=>setView('elevation')}>Elevation</button></div></div><div className="odt-visual-body"><ArrayDiagram view={view}/><div className="odt-figure-legend"><span><b>12</b> modules</span><span><b>3</b> rows</span><span><b>6 m</b> pitch</span><span><b>25°</b> tilt</span></div><p>Conceptual geometry generated from model parameters; not a surveyed installation, engineering drawing or ray-tracing result.</p></div></section>
+        </div>}
+        {(section==='overview'||section==='analysis')&&<section className="odt-panel odt-results"><div className="odt-panel-heading"><span>03 / FOOD–ENERGY–WATER</span><h2>Model output register</h2><p>Blank values are intentional: no validated numerical outputs are connected.</p></div><div className="odt-outputs"><Output name="FOOD / CROP RESPONSE" detail="Yield and soil state not computed"/><Output name="ENERGY / IRRADIANCE" detail="Ray tracing not verified"/><Output name="WATER / ET₀ & IRRIGATION" detail="No Oregon site run"/></div></section>}
+        {section==='simulation'&&<div className="odt-workgrid"><section className="odt-panel odt-input-panel"><div className="odt-panel-heading"><span>SIMULATION INPUTS</span><h2>Available model components</h2></div><div className="odt-inputs">{[['Radiation','bifacial_radiance integration'],['Weather','Synthetic EPW (smoke test only)'],['Evapotranspiration','FAO-56 reference calculation'],['Run mode','CI / scientific Python package']].map(([a,b])=><div key={a}><span>{a}</span><strong>{b}</strong></div>)}</div></section><section className="odt-panel odt-visual-panel"><div className="odt-panel-heading"><span>EXECUTION CONTROL</span><h2>Scientific runs</h2></div><div className="odt-simulation"><strong>Simulation execution is not available from this preview.</strong><p>The scientific package executes separately through the isolated research workflow. No run button is shown until a secure, traceable execution service is integrated.</p><a href="https://github.com/Profgabby/chipu-few-intelligence/actions" target="_blank" rel="noreferrer">Inspect research workflow ↗</a></div></section></div>}
+        {section==='evidence'&&<section className="odt-panel odt-evidence"><div className="odt-panel-heading"><span>VERIFICATION REGISTER</span><h2>Scientific methods and outstanding checks</h2></div><div className="odt-checks">{checks.map(([name,implemented,pending])=><div key={name}><strong>{name}</strong><span>{implemented}</span><small>{pending}</small></div>)}</div><a className="odt-source" href="https://github.com/Profgabby/chipu-few-intelligence/tree/feature/oregon-av-digital-twin-v01/scientific-core/oregon-av" target="_blank" rel="noreferrer">Scientific source and documentation ↗</a></section>}
+        <footer className="odt-footer"><span>CHIPU-FEW INTELLIGENCE / OREGON · Scientific prototype, not validated decision support</span><Link to="/app">Return to main platform ↗</Link></footer>
+      </main>
+    </div>
   </div>
 }
