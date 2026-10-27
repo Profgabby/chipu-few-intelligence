@@ -30,6 +30,7 @@ jobs:
         run: |
           python scientific-core/oregon-av/scripts/validate_oregon_registry.py
           python -m unittest discover -s scientific-core/oregon-av/tests -p 'test_ingest_nasa_power_daily.py' -v
+          python -m unittest discover -s scientific-core/oregon-av/tests -p 'test_compare_station_weather.py' -v
       - name: Fetch NASA POWER actual source data and verify integrity
         env:
           DATA_YEAR: ${{ github.event.inputs.year || '2024' }}
