@@ -1,5 +1,11 @@
 name: Oregon Synthetic Radiance (isolated)
 on:
+  push:
+    branches: [feature/oregon-av-digital-twin-v01]
+    paths:
+      - 'scientific-core/oregon-av/src/chipu_oregon/radiance_synthetic.py'
+      - 'scientific-core/oregon-av/src/chipu_oregon/synthetic_epw.py'
+      - '.github/workflows/oregon-radiance-synthetic.yml'
   workflow_dispatch:
     inputs:
       epw_path:
@@ -19,12 +25,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Initialize evidence directory
+        run: mkdir -p results/radiance-synthetic
       - name: Install Radiance and Python scientific packages
         run: |
-          sudo apt-get update
-          sudo apt-get install -y radiance
-          python -m pip install -e .
-          python -m pip install 'bifacial_radiance>=0.4,<1'
+          set -o pipefail
+          sudo apt-get update 2>&1 | tee results/radiance-synthetic/apt-update.log
+          sudo apt-get install -y radiance 2>&1 | tee results/radiance-synthetic/apt-install.log
+          python -m pip install -e . 2>&1 | tee results/radiance-synthetic/pip-project.log
+          python -m pip install 'bifacial_radiance>=0.4,<1' 2>&1 | tee results/radiance-synthetic/pip-radiance.log
           command -v oconv
           command -v rtrace
       - name: Record environment and source
@@ -37,7 +46,7 @@ jobs:
           (rtrace -version || true) 2>&1 | tee results/radiance-synthetic/rtrace-version.txt
       - name: Verify EPW input exists
         env:
-          EPW_PATH: ${{ inputs.epw_path }}
+          EPW_PATH: ${{ inputs.epw_path || 'synthetic' }}
         run: |
           if [ "$EPW_PATH" = "synthetic" ]; then
             python -m chipu_oregon.synthetic_epw --output results/radiance-synthetic/synthetic-smoke.epw
@@ -52,7 +61,7 @@ jobs:
           sha256sum "$GITHUB_WORKSPACE/$EPW_PATH" | tee results/radiance-synthetic/input-epw.sha256
       - name: Run ray tracing and archive complete log
         env:
-          EPW_PATH: ${{ inputs.epw_path }}
+          EPW_PATH: ${{ inputs.epw_path || 'synthetic' }}
         run: |
           set -o pipefail
           python -m chipu_oregon.radiance_synthetic \
@@ -61,7 +70,7 @@ jobs:
       - name: Hash outputs
         if: always()
         run: |
-          find results/radiance-synthetic -type f -print0 | sort -z | xargs -0 -r sha256sum > results/radiance-synthetic/output-sha256.txt
+          find results/radiance-synthetic -type f ! -name output-sha256.txt -print0 | sort -z | xargs -0 -r sha256sum > results/radiance-synthetic/output-sha256.txt
       - name: Upload evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
