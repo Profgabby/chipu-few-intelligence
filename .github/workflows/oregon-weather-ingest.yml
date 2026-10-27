@@ -26,6 +26,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate registry and ingestion contract offline
+        run: |
+          python scientific-core/oregon-av/scripts/validate_oregon_registry.py
+          python -m unittest discover -s scientific-core/oregon-av/tests -p 'test_ingest_nasa_power_daily.py' -v
       - name: Fetch NASA POWER actual source data and verify integrity
         env:
           DATA_YEAR: ${{ github.event.inputs.year || '2024' }}
