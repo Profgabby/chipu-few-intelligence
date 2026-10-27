@@ -1,0 +1,52 @@
+name: Oregon real meteorological data ingestion
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Completed calendar year'
+        required: true
+        default: '2024'
+  push:
+    branches:
+      - feature/oregon-av-digital-twin-v01
+    paths:
+      - 'scientific-core/oregon-av/scripts/ingest_nasa_power_daily.py'
+      - '.github/workflows/oregon-weather-ingest.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch NASA POWER actual source data and verify integrity
+        env:
+          DATA_YEAR: ${{ github.event.inputs.year || '2024' }}
+        run: |
+          python scientific-core/oregon-av/scripts/ingest_nasa_power_daily.py --year "$DATA_YEAR" --outdir results/oregon-weather
+          python - <<'PY'
+          import json,hashlib,pathlib
+          root=pathlib.Path("results/oregon-weather")
+          m=json.loads((root/"manifest.json").read_text())
+          assert len(m["locations"])==2
+          for loc in m["locations"].values():
+              b=(root/loc["raw_file"]).read_bytes()
+              assert hashlib.sha256(b).hexdigest()==loc["sha256"]
+              assert loc["qc"]["days"] in (365,366)
+          print("Raw file checksums and daily coverage verified")
+          PY
+      - name: Preserve raw inputs, checksums and quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oregon-nasa-power-source-data
+          path: results/oregon-weather/
+          if-no-files-found: warn
+          retention-days: 90
