@@ -56,7 +56,7 @@ jobs:
         run: |
           set -o pipefail
           python -m chipu_oregon.radiance_synthetic \
-            --epw "$GITHUB_WORKSPACE/$EPW_PATH" \
+            --epw "$RESOLVED_EPW" \
             --output results/radiance-synthetic 2>&1 | tee results/radiance-synthetic/execution.log
       - name: Hash outputs
         if: always()
