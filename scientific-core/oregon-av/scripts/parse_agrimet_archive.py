@@ -52,7 +52,7 @@ def parse(raw:bytes,station:str):
         if len(cells)!=len(header): raise ValueError("Unexpected archive column count")
         date_token=cells[0]
         if not DATE_RE.fullmatch(date_token): raise ValueError("Unrecognized archive date "+date_token)
-        dt=datetime.strptime(date_token,"%Y%m%d" if len(date_token)==8 else "%Y-%m-%d")
+        dt=datetime.strptime(date_token,"%m/%d/%Y" if "/" in date_token else ("%Y%m%d" if len(date_token)==8 else "%Y-%m-%d"))
         day=dt.strftime("%Y-%m-%d")
         if day in seen: raise ValueError("Duplicate date "+day)
         seen.add(day)
@@ -65,7 +65,7 @@ def parse(raw:bytes,station:str):
             else:
                 try: record[field]=round(CONVERSIONS[code](float(value)),8)
                 except ValueError as e:raise ValueError(f"{day}: invalid {code} value") from e
-        out.append(record)
+        if record.get("precip_mm") != "" and "precip_mm" in record and record["precip_mm"] < 0:\n            record["precip_mm"] = ""  # invalid negative precipitation; retain original raw value in source\n        out.append(record)
     return out
 
 def convert(raw_path:Path,station:str,out_path:Path):
