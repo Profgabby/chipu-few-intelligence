@@ -20,3 +20,12 @@ The software architecture must support all Oregon coordinates, with Central Oreg
 
 ## Next engineering action
 Implement one source adapter and a reproducible ingestion test using a small genuine source file with its license, acquisition metadata and checksum. A registered URL is not a completed data integration.
+
+## Initial genuine meteorological acquisition (2024)
+A reproducible NASA POWER adapter is now committed at `scripts/ingest_nasa_power_daily.py`, with a GitHub Actions job `.github/workflows/oregon-weather-ingest.yml`. The job is configured to acquire **actual externally sourced NASA POWER daily data** for two candidate reference coordinates: Madras (44.63 N, 121.13 W) and Aurora (45.22 N, 122.75 W). These are geographic sampling points, **not confirmed agrivoltaic installations**. Requested year: 2024 (366 days). Parameters: T2M, T2M_MAX, T2M_MIN, PRECTOTCORR, RH2M, WS2M, ALLSKY_SFC_SW_DWN.
+
+**Scientific classification:** NASA POWER is an environmental gridded data product, not on-site instrument observations. The source product must be checked against Oregon stations and native product metadata. Daily mean shortwave energy cannot substitute for hourly DNI/DHI in detailed Radiance forcing.
+
+**Evidence gate:** A committed adapter or a green workflow is not proof that raw data were ingested. Before the dashboard reports real-data coverage, inspect the Actions artifact `oregon-nasa-power-source-data`, verify both raw JSON files against manifest SHA-256 hashes, inspect missing-data flags, and document the actual source metadata and date coverage. The CI artifact is retained for 90 days; permanent scientific archiving requires an additional repository/data-store policy.
+
+**Known limitations:** The current QA checks day completeness, missing values and broad physical bounds. It does not yet detect cross-variable inconsistencies, source grid-cell duplication, temporal autocorrelation anomalies or discrepancies with independent AgriMet observations. No scientific model is connected to these inputs yet.
