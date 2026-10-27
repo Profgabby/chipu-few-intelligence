@@ -1,0 +1,101 @@
+{
+  "schema_version": "0.1.0",
+  "purpose": "Oregon-wide research data source registry; no datasets ingested or site-specific observations claimed",
+  "geographic_scope": "Oregon, USA",
+  "focus_regions": [
+    {
+      "id": "central_oregon",
+      "label": "Central Oregon",
+      "reference_area": "Madras / Jefferson County",
+      "status": "candidate_reference_area_not_field_site",
+      "rationale": "Irrigation-intensive agriculture; contrasting climate regime"
+    },
+    {
+      "id": "willamette_valley",
+      "label": "Willamette Valley",
+      "reference_area": "Aurora / North Willamette",
+      "status": "candidate_reference_area_not_field_site",
+      "rationale": "Willamette Valley agriculture; investigate OSU agrivoltaic research data access"
+    }
+  ],
+  "sources": [
+    {
+      "id": "prism",
+      "name": "PRISM Climate Group",
+      "provider": "Oregon State University",
+      "url": "https://prism.oregonstate.edu/data/",
+      "variables": [
+        "air_temperature",
+        "precipitation"
+      ],
+      "kind": "gridded_climate_estimates",
+      "status": "registered_not_ingested"
+    },
+    {
+      "id": "nsrdb",
+      "name": "National Solar Radiation Database",
+      "provider": "National Laboratory of the Rockies",
+      "url": "https://developer.nlr.gov/docs/solar/nsrdb/",
+      "variables": [
+        "ghi",
+        "dni",
+        "dhi"
+      ],
+      "kind": "satellite_modeled_solar_resource",
+      "status": "registered_not_ingested"
+    },
+    {
+      "id": "agrimet",
+      "name": "AgriMet",
+      "provider": "US Bureau of Reclamation",
+      "url": "https://www.usbr.gov/pn/agrimet/wxdata.html",
+      "variables": [
+        "reference_et",
+        "air_temperature",
+        "relative_humidity",
+        "wind_speed"
+      ],
+      "kind": "station_observations_and_derived_et",
+      "status": "registered_not_ingested"
+    },
+    {
+      "id": "ssurgo",
+      "name": "SSURGO",
+      "provider": "USDA NRCS",
+      "url": "https://www.nrcs.usda.gov/resources/data-and-reports/web-soil-survey",
+      "variables": [
+        "soil_map_units",
+        "texture",
+        "available_water_capacity"
+      ],
+      "kind": "mapped_soil_survey",
+      "status": "registered_not_ingested"
+    },
+    {
+      "id": "openet",
+      "name": "OpenET",
+      "provider": "OpenET",
+      "url": "https://etdata.org/",
+      "variables": [
+        "satellite_et"
+      ],
+      "kind": "satellite_based_field_scale_et",
+      "status": "registered_not_ingested"
+    }
+  ],
+  "provenance_required": [
+    "source_id",
+    "retrieved_at_utc",
+    "source_version_or_access_date",
+    "temporal_coverage",
+    "spatial_coverage",
+    "native_resolution",
+    "units",
+    "time_zone",
+    "license_or_access_terms",
+    "checksum_sha256",
+    "quality_flags",
+    "transformation_history"
+  ],
+  "release_policy": "Do not label model output as validated until verification and independent field evaluation are documented."
+}
