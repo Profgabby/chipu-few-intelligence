@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, LayoutDashboard, Menu, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
+import { Activity, BarChart3, BookOpen, Database, Droplets, Gauge, LayoutDashboard, MapPinned, Menu, ShieldCheck, Sprout, TrendingUp, X, Zap } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { ResearchContextProvider } from '../lib/research-context'
 import { PlaceContextBoundary } from '../components/PlaceContextBoundary'
@@ -15,6 +15,7 @@ const groups:readonly NavGroup[]=[
     ['/app/data','Data & Context',Database],
     ['/app/location','Location & System',Database],
     ['/app/twin','Digital Twin',Activity],
+    ['/oregon-digital-twin','Oregon Digital Twin ↗',MapPinned],
     ['/app/model-laboratory','Model Laboratory',BarChart3],
     ['/app/predict','Prediction',TrendingUp],
   ]},
