@@ -49,6 +49,16 @@ jobs:
       - name: Audit downloaded records and compare regions
         run: |
           python scientific-core/oregon-av/scripts/audit_oregon_weather.py --dir results/oregon-weather
+          python - <<'PY'
+          import json, pathlib
+          root=pathlib.Path('results/oregon-weather')
+          audit=json.loads((root/'audit.json').read_text())
+          for name, site in audit['sites'].items():
+              assert site['sha256_verified'], name
+              assert site['complete_case_days']==site['days'], f'{name}: missing meteorological observations'
+              assert not site['quality_flags'], f'{name}: cross-variable quality flags'
+          print('Two-region acquisition acceptance checks passed')
+          PY
       - name: Preserve raw inputs, checksums and quality report
         if: always()
         uses: actions/upload-artifact@v4
