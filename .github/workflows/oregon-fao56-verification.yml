@@ -1,0 +1,25 @@
+name: Oregon FAO-56 scientific core verification
+on:
+  push:
+    branches:
+      - feature/oregon-av-digital-twin-v01
+    paths:
+      - 'scientific-core/oregon-av/scripts/fao56_daily_et0.py'
+      - 'scientific-core/oregon-av/scripts/prepare_fao56_weather.py'
+      - 'scientific-core/oregon-av/tests/test_fao56_daily_et0.py'
+      - '.github/workflows/oregon-fao56-verification.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify daily FAO-56 physics and quality-control gates
+        run: python -m unittest discover -s scientific-core/oregon-av/tests -p 'test_fao56_daily_et0.py' -v
+      - name: Syntax-check meteorological adapters
+        run: python -m py_compile scientific-core/oregon-av/scripts/fao56_daily_et0.py scientific-core/oregon-av/scripts/prepare_fao56_weather.py
