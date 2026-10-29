@@ -17,7 +17,7 @@ POINTS = {
     "willamette_aurora": (45.22, -122.75),
 }
 PARAMETERS = ["T2M", "T2M_MAX", "T2M_MIN", "PRECTOTCORR", "RH2M", "WS2M", "ALLSKY_SFC_SW_DWN"]
-UNITS = {"T2M": "degC", "T2M_MAX": "degC", "T2M_MIN": "degC", "PRECTOTCORR": "mm/day", "RH2M": "percent", "WS2M": "m/s", "ALLSKY_SFC_SW_DWN": "kWh/m2/day"}
+UNITS = {"T2M": "degC", "T2M_MAX": "degC", "T2M_MIN": "degC", "PRECTOTCORR": "mm/day", "RH2M": "percent", "WS2M": "m/s", "ALLSKY_SFC_SW_DWN": "MJ/m2/day"}
 BASE = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
 def request_url(lat, lon, year):
@@ -28,7 +28,7 @@ def process(raw, year):
     data = json.loads(raw)
     if data.get("messages"):
         raise ValueError("NASA POWER messages: " + repr(data["messages"]))
-    series = data["properties"]["parameter"]
+    if data.get("parameters", {}).get("ALLSKY_SFC_SW_DWN", {}).get("units") != "MJ/m^2/day":\n        raise ValueError("Unexpected NASA POWER solar radiation unit")\n    series = data["properties"]["parameter"]
     expected = [(date(year, 1, 1) + timedelta(days=i)).strftime("%Y%m%d") for i in range((date(year+1,1,1)-date(year,1,1)).days)]
     result = {}
     flags = []
@@ -38,7 +38,7 @@ def process(raw, year):
             raise ValueError(f"{key}: date coverage mismatch ({len(values)} vs {len(expected)})")
         missing = sum(v is None or not isinstance(v,(int,float)) or not math.isfinite(v) or v <= -900 for v in values.values())
         valid = [v for v in values.values() if isinstance(v,(int,float)) and math.isfinite(v) and v > -900]
-        bounds = {"RH2M": (0,100), "PRECTOTCORR": (0,1000), "WS2M": (0,100), "ALLSKY_SFC_SW_DWN": (0,20), "T2M": (-90,65), "T2M_MAX": (-90,65), "T2M_MIN": (-90,65)}
+        bounds = {"RH2M": (0,100), "PRECTOTCORR": (0,1000), "WS2M": (0,100), "ALLSKY_SFC_SW_DWN": (0,45), "T2M": (-90,65), "T2M_MAX": (-90,65), "T2M_MIN": (-90,65)}
         low, high = bounds[key]
         outliers = [{"date": day, "value": value, "bounds": [low, high]} for day, value in values.items() if isinstance(value, (int,float)) and math.isfinite(value) and value > -900 and not low <= value <= high]
         out_of_range = len(outliers)
