@@ -22,8 +22,9 @@ def esat(t): return 0.6108*math.exp(17.27*t/(t+237.3))
 def et0_day(day,tmin,tmax,tmean,rhmean,u2,rs_mj,latitude,elevation):
     if not (-90<latitude<90 and -500<=elevation<=9000):
         raise ValueError("Invalid latitude or elevation")
-    if not (-90<tmin<=tmean<=tmax<65 and 0<=rhmean<=100 and 0<=u2<=40 and 0<=rs_mj<=50):
+    if not (-90<tmin<=tmean<=tmax<65 and 0<=rhmean<=100 and 0<=u2<=40 and 0<=rs_mj<=14):
         raise ValueError("Invalid meteorological bounds")
+    rs_mj=rs_mj*3.6  # incoming solar_kwh_m2_day -> FAO-56 MJ/m2/day
     j=day.timetuple().tm_yday
     phi=math.radians(latitude)
     dr=1+0.033*math.cos(2*math.pi*j/365)
