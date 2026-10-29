@@ -28,7 +28,9 @@ def process(raw, year):
     data = json.loads(raw)
     if data.get("messages"):
         raise ValueError("NASA POWER messages: " + repr(data["messages"]))
-    if data.get("parameters", {}).get("ALLSKY_SFC_SW_DWN", {}).get("units") != "MJ/m^2/day":\n        raise ValueError("Unexpected NASA POWER solar radiation unit")\n    series = data["properties"]["parameter"]
+    if data.get("parameters", {}).get("ALLSKY_SFC_SW_DWN", {}).get("units") != "MJ/m^2/day":
+        raise ValueError("Unexpected NASA POWER solar radiation unit")
+    series = data["properties"]["parameter"]
     expected = [(date(year, 1, 1) + timedelta(days=i)).strftime("%Y%m%d") for i in range((date(year+1,1,1)-date(year,1,1)).days)]
     result = {}
     flags = []
