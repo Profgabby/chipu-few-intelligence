@@ -25,7 +25,7 @@ def audit(folder: Path):
         if digest != meta["sha256"]:
             raise ValueError(f"{site}: SHA-256 mismatch")
         data = json.loads(raw)
-        series = data["properties"]["parameter"]
+        if data.get("parameters", {}).get("ALLSKY_SFC_SW_DWN", {}).get("units") != "MJ/m^2/day":\n            raise ValueError(f"{site}: unexpected solar radiation unit")\n        series = data["properties"]["parameter"]
         expected_days = meta["qc"]["days"]
         if any(len(series[k]) != expected_days for k in PARAMS):
             raise ValueError(f"{site}: incomplete time coverage")
@@ -53,7 +53,7 @@ def audit(folder: Path):
         b=output["sites"]["willamette_aurora"]["summary"][key]["mean"]
         output["comparisons"][key]={"central_minus_willamette":round(a-b,4) if a is not None and b is not None else None,
                                     "interpretation":"descriptive gridded-product contrast; not field validation"}
-    return output
+    output["solar_radiation_native_unit"] = "MJ/m2/day"\n    return output
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
