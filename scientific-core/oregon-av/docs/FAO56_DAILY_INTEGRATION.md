@@ -3,7 +3,7 @@
 ## Input lineage
 Original AgriMet station and NASA POWER 2024 archives -> SHA-256 verified raw files -> daily paired CSVs (`MRSO_2024_daily_paired.csv`, `ARAO_2024_daily_paired.csv`) -> **single-source** weather adapter -> FAO-56 daily ET0. The UI currently renders monthly aggregates, not the daily model output.
 
-Each paired CSV requires: `date`, `tmin_c_station`, `tmax_c_station`, `tmean_c_station`, `rh_pct_station`, `wind_m_s_station`, `solar_kwh_m2_day_station` and equivalent `_power` columns. Solar kWh/m²/day is converted to MJ/m²/day by multiplying by 3.6 inside FAO-56 model preparation? **No:** `fao56_daily_et0.py` currently expects `solar_kwh_m2_day` but the ET0 function expects MJ/m²/day. The adapter passes kWh values unchanged, so **do not execute the model for research until the unit conversion is applied**. This gate is documented explicitly to prevent silent physical errors.
+Each paired CSV requires: `date`, `tmin_c_station`, `tmax_c_station`, `tmean_c_station`, `rh_pct_station`, `wind_m_s_station`, `solar_kwh_m2_day_station` and equivalent `_power` columns. Solar radiation enters as kWh/m²/day and is explicitly multiplied by 3.6 inside `fao56_daily_et0.py` before FAO-56 radiation calculations in MJ/m²/day. The conversion is covered by regression inputs; independent published-benchmark verification is still required.
 
 ## Required authoritative metadata
 - Exact station elevation (m, vertical datum and source)
@@ -20,7 +20,7 @@ Each paired CSV requires: `date`, `tmin_c_station`, `tmax_c_station`, `tmean_c_s
 - Reference ET0 calculation is not crop evapotranspiration, not soil-water balance, and not empirical agrivoltaic validation.
 
 ## Development order
-1. Confirm authoritative elevation and wind metadata, and correct the explicit radiation unit gate.
+1. Confirm authoritative elevation and wind metadata, and independently verify the radiation-unit conversion against a published reference case.
 2. Run unit tests and daily calculations for station and gridded sources separately.
 3. Compare daily ET0 sensitivity to meteorological input source, with uncertainty and data coverage.
 4. Integrate the already-developed solar geometry and PV model with verified plane-of-array weather and surveyed array parameters.
