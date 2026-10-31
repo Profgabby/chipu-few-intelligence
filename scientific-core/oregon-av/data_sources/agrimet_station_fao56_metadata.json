@@ -1,0 +1,32 @@
+{
+  "version": "2026-10-30",
+  "status": "elevation_verified_wind_height_station_specific_pending",
+  "stations": {
+    "MRSO": {
+      "region": "central_oregon_madras",
+      "latitude": 44.68,
+      "longitude": -121.14861,
+      "elevation_ft": 743.71,
+      "elevation_m": 226.682808,
+      "source_url": "https://www.usbr.gov/pn/agrimet/agrimetmap/mrsoda.html",
+      "wind_height_m": null,
+      "wind_height_status": "unverified_for_2024"
+    },
+    "ARAO": {
+      "region": "willamette_aurora",
+      "latitude": 45.28194,
+      "longitude": -122.75027,
+      "elevation_ft": 42.67,
+      "elevation_m": 13.005816,
+      "source_url": "https://www.usbr.gov/pn/agrimet/agrimetmap/araoda.html",
+      "wind_height_m": null,
+      "wind_height_status": "unverified_for_2024"
+    }
+  },
+  "wind_network_change": {
+    "source_url": "https://www.usbr.gov/pn/agrimet/news.html",
+    "note": "USBR announced 2012 network-wide wind sensor move from 2 m to 3 m; station-specific 2024 heights require confirmation; do not assert 3 m for these stations without evidence."
+  },
+  "local_time_source": "https://www.usbr.gov/pn/agrimet/currentdata.html",
+  "release_gate": "No station ET0 without documented wind sensor height or provider-confirmed 2 m wind data."
+}
