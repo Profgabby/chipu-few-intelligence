@@ -6,8 +6,8 @@ Original AgriMet station and NASA POWER 2024 archives -> SHA-256 verified raw fi
 Each paired CSV requires: `date`, `tmin_c_station`, `tmax_c_station`, `tmean_c_station`, `rh_pct_station`, `wind_m_s_station`, `solar_kwh_m2_day_station` and equivalent `_power` columns. Solar radiation enters as kWh/m²/day and is explicitly multiplied by 3.6 inside `fao56_daily_et0.py` before FAO-56 radiation calculations in MJ/m²/day. The conversion is covered by regression inputs; independent published-benchmark verification is still required.
 
 ## Required authoritative metadata
-- Exact station elevation (m, vertical datum and source)
-- Wind sensor height and whether `wind_m_s` is 2 m equivalent; adjust using FAO-56 log-wind profile only with documented height
+- Station elevations verified from USBR station pages: MRSO 743.71 ft = 226.68 m; ARAO 42.67 ft = 13.01 m. These are station, not proposed field-site, elevations. See `data_sources/agrimet_station_fao56_metadata.json`.
+- Wind sensor height in 2024 is **not station-specifically verified**. USBR reports a network change from 2 m to 3 m in 2012, but this is not proof of the 2024 height at MRSO or ARAO. The ET0 function now applies FAO-56 Eq. 47 to convert a **documented** wind height to 2 m; it refuses missing height metadata.
 - Station data day boundary, UTC/local time and solar accumulation convention
 - Radiation source units, humidity method, station instrument QC
 
