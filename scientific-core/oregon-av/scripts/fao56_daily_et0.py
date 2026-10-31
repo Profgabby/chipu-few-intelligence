@@ -47,9 +47,16 @@ def et0_day(day,tmin,tmax,tmean,rhmean,u2,rs_mj,latitude,elevation):
     denominator=delta_s+gamma*(1+0.34*u2)
     return max(0,numerator/denominator)
 
+def normalize_wind_to_2m(wind_speed, measurement_height_m):
+    """FAO-56 Eq. 47; wind speed observed at documented height z (m)."""
+    if not 0.1 <= measurement_height_m <= 100:
+        raise ValueError("Wind measurement height must be documented in meters")
+    return wind_speed * 4.87 / math.log(67.8 * measurement_height_m - 5.42)
+
 def calculate(csv_path,latitude,elevation,wind_height_m,expected_year):
-    if abs(wind_height_m-2)>0.001:
-        raise ValueError("Wind speed measurement height is not verified as 2 m; do not assume normalization")
+    if wind_height_m is None:
+        raise ValueError("Station-specific 2024 wind measurement height not verified")
+    normalize_wind_to_2m(1.0,wind_height_m)
     rows=list(csv.DictReader(csv_path.open(encoding="utf-8",newline="")))
     required={"date","tmin_c","tmax_c","tmean_c","rh_pct","wind_m_s","solar_kwh_m2_day"}
     if not rows or not required.issubset(rows[0]): raise ValueError("Missing daily input columns")
@@ -62,6 +69,7 @@ def calculate(csv_path,latitude,elevation,wind_height_m,expected_year):
             seen.add(key)
             vals=[float(row[k]) for k in ("tmin_c","tmax_c","tmean_c","rh_pct","wind_m_s","solar_kwh_m2_day")]
             if not all(math.isfinite(x) for x in vals):raise ValueError("nonfinite")
+            vals[4]=normalize_wind_to_2m(vals[4],wind_height_m)
             et=et0_day(day,*vals,latitude,elevation)
             result.append({"date":key,"et0_mm_day":round(et,5)})
         except (ValueError,OverflowError,ZeroDivisionError) as exc:
@@ -72,6 +80,7 @@ def calculate(csv_path,latitude,elevation,wind_height_m,expected_year):
       "method":"FAO-56 daily Penman-Monteith grass reference; RHmean-based ea approximation; G=0",
       "source_sha256":hashlib.sha256(csv_path.read_bytes()).hexdigest(),
       "latitude":latitude,"elevation_m":elevation,"wind_height_m":wind_height_m,
+      "wind_normalization":"FAO-56 Eq 47: u2=uz*4.87/ln(67.8*z-5.42)",
       "year":expected_year,"expected_days":expected,"valid_days":len(result),
       "flags":flags,"daily":result}
 
