@@ -6,7 +6,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from fao56_daily_et0 import calculate,et0_day
+from fao56_daily_et0 import calculate,et0_day,normalize_wind_to_2m
 
 class DailyET0Tests(unittest.TestCase):
     def test_reference_et_positive_and_finite(self):
@@ -21,12 +21,15 @@ class DailyET0Tests(unittest.TestCase):
     def test_bad_temperature_rejected(self):
         with self.assertRaises(ValueError):
             et0_day(date(2024,1,1),20,10,15,50,2,4,45,100)
+    def test_wind_height_conversion(self):
+        self.assertAlmostEqual(normalize_wind_to_2m(2,2),2,places=2)
+        self.assertLess(normalize_wind_to_2m(2,3),2)
     def test_unverified_wind_height_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/"weather.csv"
             path.write_text("date,tmin_c,tmax_c,tmean_c,rh_pct,wind_m_s,solar_kwh_m2_day\n2024-01-01,0,10,5,60,2,3\n")
             with self.assertRaises(ValueError):
-                calculate(path,44.68,700,10,2024)
+                calculate(path,44.68,700,None,2024)
     def test_missing_days_are_flagged_not_imputed(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/"weather.csv"
