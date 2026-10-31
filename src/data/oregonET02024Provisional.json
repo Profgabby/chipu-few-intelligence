@@ -1,0 +1,101 @@
+{
+  "year": 2024,
+  "status": "PROVISIONAL_NOT_APPROVED",
+  "method": "FAO-56 daily PM; daily mean RH vapor pressure approximation; G=0; observed horizontal solar kWh/m2/day converted to MJ/m2/day",
+  "data_source": "User-provided 2024 date-aligned paired AgriMet and NASA POWER daily CSVs",
+  "station_wind_assumption": "3 m sensitivity assumption based on USBR 2012 network change; not verified station-specific for 2024",
+  "power_wind_height": "2 m (NASA POWER WS2M)",
+  "site_elevation_m": {
+    "MRSO": 226.682808,
+    "ARAO": 13.005816
+  },
+  "months": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "regions": {
+    "central_oregon": {
+      "station": "MRSO",
+      "station_monthly_et0_mm": [
+        16.93,
+        25.26,
+        62.97,
+        82.83,
+        122.08,
+        166.93,
+        211.06,
+        153.67,
+        112,
+        58.81,
+        31.94,
+        16.29
+      ],
+      "power_monthly_et0_mm": [
+        10.97,
+        20.25,
+        46.96,
+        68.45,
+        105.41,
+        135.62,
+        173.34,
+        127.06,
+        88.6,
+        47.55,
+        15.14,
+        10.05
+      ],
+      "station_annual_et0_mm": 1060.77,
+      "power_annual_et0_mm": 849.4
+    },
+    "willamette_valley": {
+      "station": "ARAO",
+      "station_monthly_et0_mm": [
+        15.24,
+        24.32,
+        51.29,
+        77.72,
+        107.79,
+        131.87,
+        164.28,
+        120.05,
+        77.06,
+        38.95,
+        16.7,
+        11.13
+      ],
+      "power_monthly_et0_mm": [
+        9.6,
+        16.33,
+        37.2,
+        58.48,
+        87.34,
+        106.64,
+        142.69,
+        99.87,
+        63.75,
+        33.22,
+        10.58,
+        7.12
+      ],
+      "station_annual_et0_mm": 836.41,
+      "power_annual_et0_mm": 672.81
+    }
+  },
+  "notes": [
+    "Preliminary sensitivity results, not calibrated or independently benchmark-verified",
+    "No imputation; 366 daily ET0 values per source and region passed basic range screening",
+    "Annual totals computed from unrounded daily ET0; monthly figures are rounded",
+    "Station wind height is unverified; station ET0 requires release gate",
+    "Gridded input comparison is not field validation"
+  ]
+}
