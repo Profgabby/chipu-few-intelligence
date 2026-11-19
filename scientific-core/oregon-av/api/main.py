@@ -141,7 +141,7 @@ class PairedInput(BaseModel):
     scenario: ScenarioInput
     records: list[dict] = Field(min_length=1, max_length=3660)
     av_et_multiplier: float = Field(default=1.0, ge=0, le=1)
-    save_local: bool = False
+    shading_mode: str = Field(default="projected", pattern="^(projected|raytraced)$")\n    grid_spacing_m: float = Field(default=0.25, gt=0, le=5)\n    save_local: bool = False
     label: str = Field(default="", max_length=120)
 
 @app.post("/runs/paired")
