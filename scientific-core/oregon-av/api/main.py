@@ -1,7 +1,10 @@
 """Independent Oregon research API. No main CHIPU-FEW dependencies."""
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
+import csv
+import io
+from fastapi import UploadFile, File, Form
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -47,3 +50,51 @@ def simulate_coupled(request: ScenarioInput):
         return simulate(Scenario(**request.model_dump()))
     except (ValueError, ZeroDivisionError, OverflowError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+@app.post("/simulate/dataset")
+async def simulate_dataset(
+    file: UploadFile = File(...),
+    panel_area_m2: float = Form(26.4),
+    pv_efficiency: float = Form(0.20),
+    pv_performance_ratio: float = Form(0.85),
+):
+    """Run the existing coupled Python model against uploaded daily forcing.
+    
+    Expected CSV: date,irradiation_kwh_m2,et0_mm,rain_mm
+    Files are processed in memory, not saved to a server.
+    """
+    if not 0 < panel_area_m2 <= 100000 or not 0 < pv_efficiency <= 1 or not 0 < pv_performance_ratio <= 1:
+        raise HTTPException(422, "Invalid PV configuration")
+    raw = await file.read(10_000_001)
+    if len(raw) > 10_000_000:
+        raise HTTPException(413, "CSV exceeds 10 MB")
+    try:
+        reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
+        required = {"date", "irradiation_kwh_m2", "et0_mm", "rain_mm"}
+        if not required.issubset(set(reader.fieldnames or [])):
+            raise ValueError("Required CSV columns: date, irradiation_kwh_m2, et0_mm, rain_mm")
+        output = []
+        soil = Scenario().soil_initial_mm
+        dates = set()
+        for row in reader:
+            if len(output) >= 3660:
+                raise ValueError("Maximum 3660 daily rows")
+            day = row["date"].strip()
+            if not day or day in dates:
+                raise ValueError("Date missing or duplicated")
+            dates.add(day)
+            forcing = {key: float(row[key]) for key in ("irradiation_kwh_m2", "et0_mm", "rain_mm")}
+            if any(not __import__("math").isfinite(value) or value < 0 for value in forcing.values()):
+                raise ValueError("Forcing values must be finite and nonnegative")
+            scenario = replace(Scenario(), **forcing, panel_area_m2=panel_area_m2,
+                pv_efficiency=pv_efficiency, pv_performance_ratio=pv_performance_ratio,
+                soil_initial_mm=soil)
+            result = simulate(scenario)
+            soil = result["water"]["soil_final_mm"]
+            output.append({"date": day, **result})
+        if not output:
+            raise ValueError("CSV has no rows")
+    except (UnicodeError, ValueError, KeyError, TypeError) as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+    return {"rows": len(output), "daily": output, "model": "chipu_oregon.coupled.simulate",
+            "source_filename": file.filename}
