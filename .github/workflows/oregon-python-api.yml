@@ -1,0 +1,26 @@
+name: Oregon Python API
+
+on:
+  push:
+    branches:
+      - feature/oregon-independent-python-api
+    paths:
+      - 'scientific-core/oregon-av/**'
+      - '.github/workflows/oregon-python-api.yml'
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scientific-core/oregon-av
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install scientific core and API dependencies
+        run: python -m pip install -r requirements-api.txt httpx
+      - name: Run Python unit and API tests
+        run: python -m unittest discover -s tests -v
