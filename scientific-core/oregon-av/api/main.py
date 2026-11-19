@@ -90,7 +90,7 @@ async def simulate_dataset(
                 pv_efficiency=pv_efficiency, pv_performance_ratio=pv_performance_ratio,
                 soil_initial_mm=soil)
             result = simulate(scenario)
-            soil = result["water"]["soil_final_mm"]
+            soil = result["water"]["ending_storage_mm"]
             output.append({"date": day, **result})
         if not output:
             raise ValueError("CSV has no rows")
