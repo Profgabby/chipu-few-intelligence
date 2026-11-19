@@ -61,7 +61,7 @@ def ground_transmission(geometry: ArrayGeometry, forcing: DailyForcing) -> dict:
             "shade_fraction": shade_fraction}
 
 def paired_run(geometry: ArrayGeometry, base: Scenario,
-               records: list[DailyForcing], av_et_multiplier: float = 1.0,\n               shading_mode: str = "projected", grid_spacing_m: float = 0.25) -> dict:
+               records: list[DailyForcing], av_et_multiplier: float = 1.0,\n               shading_mode: str = "projected", grid_spacing_m: float = 0.25,\n               radiation_records: list[dict] | None = None) -> dict:
     """Compare open field and AV with matched forcing and independent water states.
 
     av_et_multiplier is an explicit user-supplied crop/microclimate assumption,
@@ -106,10 +106,10 @@ def paired_run(geometry: ArrayGeometry, base: Scenario,
         "open_field_final_storage_mm": open_storage,
         "agrivoltaic_final_storage_mm": av_storage,
     }
-    summary["delta_et_mm"] = summary["agrivoltaic_et_mm"] - summary["open_field_et_mm"]
+    summary["delta_et_mm"] = summary["agrivoltaic_et_mm"] - summary["open_field_et_mm"]\n    radiation = None\n    if radiation_records is not None:\n        from .time_resolved_radiation import integrate_ground_radiation\n        radiation = integrate_ground_radiation(geometry, radiation_records,\n                                               grid_spacing_m=grid_spacing_m)\n        summary["ground_open_radiation_kwh_m2"] = radiation["ground_open_kwh_m2"]\n        summary["ground_av_radiation_kwh_m2"] = radiation["ground_av_kwh_m2_mean"]
     payload = {"geometry": asdict(geometry), "scenario": asdict(base),
-               "forcing": [asdict(d) for d in records], "av_et_multiplier": av_et_multiplier,\n               "shading_mode": shading_mode, "grid_spacing_m": grid_spacing_m}
+               "forcing": [asdict(d) for d in records], "av_et_multiplier": av_et_multiplier,\n               "shading_mode": shading_mode, "grid_spacing_m": grid_spacing_m,\n               "radiation_records": radiation_records}
     digest = sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
     return {"run_id": digest[:20], "input_sha256": digest, "summary": summary,
-            "daily": days, "geometry": asdict(geometry),
+            "daily": days, "radiation": radiation, "geometry": asdict(geometry),
             "model": "paired_geometry_coupled_v1", "shading_mode": shading_mode}
