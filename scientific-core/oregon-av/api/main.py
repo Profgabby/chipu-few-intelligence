@@ -17,6 +17,7 @@ from chipu_oregon.paired import DailyForcing, paired_run
 from chipu_oregon.radiance_geometry import ArrayGeometry
 from chipu_oregon.registry import save_run, list_runs
 from chipu_oregon.sensitivity import sweep
+from chipu_oregon.time_resolved_radiation import integrate_ground_radiation
 from pathlib import Path
 
 app = FastAPI(title="CHIPU-FEW Oregon Scientific API", version="0.1.0")
@@ -184,3 +185,21 @@ def run_sensitivity(request: SensitivityInput):
             request.factors, max_runs=request.max_runs)
     except (ValueError, TypeError, KeyError, ZeroDivisionError, OverflowError) as exc:
         raise HTTPException(422, detail=str(exc)) from exc
+
+class RadiationInput(BaseModel):
+    geometry: dict
+    records: list[dict] = Field(min_length=1, max_length=105120)
+    grid_spacing_m: float = Field(default=0.4, gt=0, le=5)
+    n_mu: int = Field(default=8, ge=1, le=32)
+    n_az: int = Field(default=24, ge=1, le=96)
+
+@app.post("/runs/radiation")
+def run_radiation(request: RadiationInput):
+    """Calculate time-integrated ground irradiance and sky visibility in Python."""
+    try:
+        return integrate_ground_radiation(
+            ArrayGeometry(**request.geometry), request.records,
+            grid_spacing_m=request.grid_spacing_m,
+            n_mu=request.n_mu, n_az=request.n_az)
+    except (ValueError, TypeError, KeyError, OverflowError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
