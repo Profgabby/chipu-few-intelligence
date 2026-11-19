@@ -12,6 +12,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from chipu_oregon.coupled import Scenario, simulate
+from chipu_oregon.pipeline import Site, CropSoil, Irrigation, PV, run_daily
 
 app = FastAPI(title="CHIPU-FEW Oregon Scientific API", version="0.1.0")
 # Local development origin only; configure deployment origins explicitly later.
@@ -112,3 +113,20 @@ async def simulate_dataset(
     }
     return {"rows": len(output), "summary": summary, "daily": output, "model": "chipu_oregon.coupled.simulate",
             "source_filename": file.filename}
+
+class ResearchRunInput(BaseModel):
+    site: dict
+    crop_soil: dict
+    irrigation: dict
+    pv: dict
+    records: list[dict] = Field(min_length=1, max_length=3660)
+
+@app.post("/runs/research")
+def research_run(request: ResearchRunInput):
+    """Execute Python PVWatts DC, FAO-56 root-zone, and hydraulic models."""
+    try:
+        return run_daily(
+            Site(**request.site), CropSoil(**request.crop_soil),
+            Irrigation(**request.irrigation), PV(**request.pv), request.records)
+    except (ValueError, TypeError, KeyError, ZeroDivisionError, OverflowError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
