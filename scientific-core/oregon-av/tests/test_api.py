@@ -24,6 +24,38 @@ class TestOregonAPI(unittest.TestCase):
         self.assertIn("water", r.json())
         self.assertIn("pumping", r.json())
 
+    def test_daily_csv_carries_water_state_and_summarizes(self):
+        csv_data = (
+            "date,irradiation_kwh_m2,et0_mm,rain_mm\\n"
+            "2024-06-01,6.2,4.1,0\\n"
+            "2024-06-02,6.0,3.8,1.5\\n"
+        )
+        response = self.client.post(
+            "/simulate/dataset",
+            files={"file": ("daily.csv", csv_data, "text/csv")},
+            data={"panel_area_m2": "26.4", "pv_efficiency": "0.20", "pv_performance_ratio": "0.85"},
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        data = response.json()
+        self.assertEqual(data["rows"], 2)
+        self.assertAlmostEqual(
+            data["daily"][1]["parameters"]["soil_initial_mm"],
+            data["daily"][0]["water"]["ending_storage_mm"],
+        )
+        self.assertAlmostEqual(
+            data["summary"]["pv_electricity_kwh"],
+            sum(day["pv_electricity_kwh"] for day in data["daily"]),
+        )
+
+    def test_reject_unsorted_dates(self):
+        csv_data = (
+            "date,irradiation_kwh_m2,et0_mm,rain_mm\\n"
+            "2024-06-02,6.0,3.8,0\\n"
+            "2024-06-01,6.2,4.1,0\\n"
+        )
+        response = self.client.post("/simulate/dataset", files={"file": ("daily.csv", csv_data, "text/csv")})
+        self.assertEqual(response.status_code, 422)
+
     def test_reject_invalid(self):
         r = self.client.post("/simulate/coupled", json={"ground_transmission": 1.5})
         self.assertEqual(r.status_code, 422)
