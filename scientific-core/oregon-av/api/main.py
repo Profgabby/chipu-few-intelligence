@@ -16,6 +16,7 @@ from chipu_oregon.pipeline import Site, CropSoil, Irrigation, PV, run_daily
 from chipu_oregon.paired import DailyForcing, paired_run
 from chipu_oregon.radiance_geometry import ArrayGeometry
 from chipu_oregon.registry import save_run, list_runs
+from chipu_oregon.sensitivity import sweep
 from pathlib import Path
 
 app = FastAPI(title="CHIPU-FEW Oregon Scientific API", version="0.1.0")
@@ -166,3 +167,20 @@ def local_runs():
     if not root:
         raise HTTPException(409, "Local run registry is not configured")
     return {"runs": list_runs(root)}
+
+class SensitivityInput(BaseModel):
+    geometry: dict
+    scenario: ScenarioInput
+    records: list[dict] = Field(min_length=1, max_length=3660)
+    factors: dict[str, list[float]]
+    max_runs: int = Field(default=250, ge=1, le=1000)
+
+@app.post("/runs/sensitivity")
+def run_sensitivity(request: SensitivityInput):
+    try:
+        return sweep(ArrayGeometry(**request.geometry),
+            Scenario(**request.scenario.model_dump()),
+            [DailyForcing(**row) for row in request.records],
+            request.factors, max_runs=request.max_runs)
+    except (ValueError, TypeError, KeyError, ZeroDivisionError, OverflowError) as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
