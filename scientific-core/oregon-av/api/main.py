@@ -4,6 +4,9 @@ from __future__ import annotations
 from dataclasses import asdict, replace
 import csv
 import io
+import math
+import os
+from datetime import date
 from fastapi import UploadFile, File, Form
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +15,7 @@ from chipu_oregon.coupled import Scenario, simulate
 
 app = FastAPI(title="CHIPU-FEW Oregon Scientific API", version="0.1.0")
 # Local development origin only; configure deployment origins explicitly later.
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+app.add_middleware(CORSMiddleware, allow_origins=[origin.strip() for origin in os.getenv("OREGON_ALLOWED_ORIGINS", "http://localhost:5173").split(",") if origin.strip()], allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 
 class ScenarioInput(BaseModel):
     irradiation_kwh_m2: float = Field(default=4.0, ge=0)
@@ -76,15 +79,18 @@ async def simulate_dataset(
         output = []
         soil = Scenario().soil_initial_mm
         dates = set()
+        previous_date = None
         for row in reader:
             if len(output) >= 3660:
                 raise ValueError("Maximum 3660 daily rows")
             day = row["date"].strip()
-            if not day or day in dates:
-                raise ValueError("Date missing or duplicated")
+            parsed_day = date.fromisoformat(day)
+            if day in dates or (previous_date is not None and parsed_day <= previous_date):
+                raise ValueError("Dates must be unique and strictly increasing")
+            previous_date = parsed_day
             dates.add(day)
             forcing = {key: float(row[key]) for key in ("irradiation_kwh_m2", "et0_mm", "rain_mm")}
-            if any(not __import__("math").isfinite(value) or value < 0 for value in forcing.values()):
+            if any(not math.isfinite(value) or value < 0 for value in forcing.values()):
                 raise ValueError("Forcing values must be finite and nonnegative")
             scenario = replace(Scenario(), **forcing, panel_area_m2=panel_area_m2,
                 pv_efficiency=pv_efficiency, pv_performance_ratio=pv_performance_ratio,
@@ -96,5 +102,13 @@ async def simulate_dataset(
             raise ValueError("CSV has no rows")
     except (UnicodeError, ValueError, KeyError, TypeError) as exc:
         raise HTTPException(422, detail=str(exc)) from exc
-    return {"rows": len(output), "daily": output, "model": "chipu_oregon.coupled.simulate",
+    summary = {
+        "pv_electricity_kwh": sum(day["pv_electricity_kwh"] for day in output),
+        "pumping_electricity_kwh": sum(day["pumping"]["electricity_kwh"] for day in output),
+        "evapotranspiration_mm": sum(day["water"]["et_mm"] for day in output),
+        "drainage_mm": sum(day["water"]["drainage_mm"] for day in output),
+        "final_soil_storage_mm": soil,
+        "max_abs_water_balance_residual_mm": max(abs(day["water"]["mass_balance_residual_mm"]) for day in output),
+    }
+    return {"rows": len(output), "summary": summary, "daily": output, "model": "chipu_oregon.coupled.simulate",
             "source_filename": file.filename}
