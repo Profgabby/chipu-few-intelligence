@@ -13,6 +13,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from chipu_oregon.coupled import Scenario, simulate
 from chipu_oregon.pipeline import Site, CropSoil, Irrigation, PV, run_daily
+from chipu_oregon.paired import DailyForcing, paired_run
+from chipu_oregon.radiance_geometry import ArrayGeometry
+from chipu_oregon.registry import save_run, list_runs
+from pathlib import Path
 
 app = FastAPI(title="CHIPU-FEW Oregon Scientific API", version="0.1.0")
 # Local development origin only; configure deployment origins explicitly later.
@@ -130,3 +134,35 @@ def research_run(request: ResearchRunInput):
             Irrigation(**request.irrigation), PV(**request.pv), request.records)
     except (ValueError, TypeError, KeyError, ZeroDivisionError, OverflowError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+class PairedInput(BaseModel):
+    geometry: dict
+    scenario: ScenarioInput
+    records: list[dict] = Field(min_length=1, max_length=3660)
+    av_et_multiplier: float = Field(default=1.0, ge=0, le=1)
+    save_local: bool = False
+    label: str = Field(default="", max_length=120)
+
+@app.post("/runs/paired")
+def run_paired(request: PairedInput):
+    """Execute matched Oregon open-field/AV runs using Python geometry and FEW modules."""
+    try:
+        result = paired_run(ArrayGeometry(**request.geometry),
+            Scenario(**request.scenario.model_dump()),
+            [DailyForcing(**row) for row in request.records],
+            av_et_multiplier=request.av_et_multiplier)
+        if request.save_local:
+            root = os.getenv("OREGON_LOCAL_RUN_DIR")
+            if not root:
+                raise HTTPException(409, "Local run registry is not configured")
+            result["registry"] = save_run(root, result, label=request.label)
+        return result
+    except (ValueError, TypeError, KeyError, ZeroDivisionError, OverflowError) as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+
+@app.get("/runs/local")
+def local_runs():
+    root = os.getenv("OREGON_LOCAL_RUN_DIR")
+    if not root:
+        raise HTTPException(409, "Local run registry is not configured")
+    return {"runs": list_runs(root)}
