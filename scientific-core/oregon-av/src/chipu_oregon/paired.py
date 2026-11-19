@@ -61,7 +61,7 @@ def ground_transmission(geometry: ArrayGeometry, forcing: DailyForcing) -> dict:
             "shade_fraction": shade_fraction}
 
 def paired_run(geometry: ArrayGeometry, base: Scenario,
-               records: list[DailyForcing], av_et_multiplier: float = 1.0) -> dict:
+               records: list[DailyForcing], av_et_multiplier: float = 1.0,\n               shading_mode: str = "projected", grid_spacing_m: float = 0.25) -> dict:
     """Compare open field and AV with matched forcing and independent water states.
 
     av_et_multiplier is an explicit user-supplied crop/microclimate assumption,
@@ -80,7 +80,7 @@ def paired_run(geometry: ArrayGeometry, base: Scenario,
         previous = current
         if min(forcing.irradiation_kwh_m2, forcing.et0_mm, forcing.rain_mm) < 0:
             raise ValueError("Negative weather forcing")
-        shade = ground_transmission(geometry, forcing)
+        if shading_mode == "raytraced":\n            from .notebook_raytracing import raytraced_transmission\n            shade = raytraced_transmission(geometry, forcing, grid_spacing_m=grid_spacing_m)\n        else:\n            shade = ground_transmission(geometry, forcing)
         common = dict(irradiation_kwh_m2=forcing.irradiation_kwh_m2,
                       et0_mm=forcing.et0_mm, rain_mm=forcing.rain_mm)
         open_s = replace(base, **common, soil_initial_mm=open_storage,
@@ -108,8 +108,8 @@ def paired_run(geometry: ArrayGeometry, base: Scenario,
     }
     summary["delta_et_mm"] = summary["agrivoltaic_et_mm"] - summary["open_field_et_mm"]
     payload = {"geometry": asdict(geometry), "scenario": asdict(base),
-               "forcing": [asdict(d) for d in records], "av_et_multiplier": av_et_multiplier}
+               "forcing": [asdict(d) for d in records], "av_et_multiplier": av_et_multiplier,\n               "shading_mode": shading_mode, "grid_spacing_m": grid_spacing_m}
     digest = sha256(json.dumps(payload, sort_keys=True, allow_nan=False).encode()).hexdigest()
     return {"run_id": digest[:20], "input_sha256": digest, "summary": summary,
             "daily": days, "geometry": asdict(geometry),
-            "model": "paired_geometry_coupled_v1"}
+            "model": "paired_geometry_coupled_v1", "shading_mode": shading_mode}
